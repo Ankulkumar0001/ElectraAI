@@ -52,7 +52,7 @@
           <i data-lucide="moon" class="moon-icon"></i>
         </button>
         <!-- API Key Settings -->
-        <button id="api-settings-btn" class="header-btn" aria-label="API Settings" title="Gemini API Key Settings">
+        <button id="api-settings-btn" class="header-btn" aria-label="API Settings" title="AI API Key Settings">
           <i data-lucide="settings"></i>
         </button>
       </div>
@@ -216,6 +216,19 @@
               <span id="voice-transcript-msg"></span>
             </div>
           </div>
+          <!-- Location Share Option -->
+          <div class="form-group col-span-full" style="margin-top:8px;">
+            <label class="form-label" data-en="Your Location (Optional)" data-hi="आपकी लोकेशन (वैकल्पिक)">Your Location (Optional)</label>
+            <p class="symptoms-helper-text" data-en="Share your location to find nearby repair shops within 10km." data-hi="10km के अंदर नजदीकी दुकानें ढूंढने के लिए अपनी लोकेशन शेयर करें।">Share your location to find nearby repair shops within 10km.</p>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:8px;">
+              <button type="button" id="share-location-btn" class="btn btn-secondary" style="gap:8px;">
+                <i data-lucide="map-pin"></i>
+                <span id="location-btn-text" data-en="Share My Location" data-hi="लोकेशन शेयर करें">Share My Location</span>
+              </button>
+              <span id="location-status-text" style="font-size:12px; color:var(--text-muted);"></span>
+            </div>
+          </div>
+
         </form>
 
         <!-- Form Stepper Navigation -->
@@ -479,6 +492,19 @@
               </div>
               <p class="service-meta-text" data-en="Highly rated centers specializing in your device category." data-hi="आपके उपकरण की श्रेणी में विशेषज्ञता रखने वाले उच्च रेटेड केंद्र।">Highly rated centers specializing in your device category.</p>
               
+              <!-- Nearby Real Shops from Location -->
+              <div id="nearby-shops-container" style="display:none;">
+                <div class="panel-subheader" style="padding:12px 16px 8px 16px; border-bottom:none;">
+                  <i data-lucide="navigation" class="subheader-icon text-cyan" style="width:16px;height:16px;"></i>
+                  <h3 style="font-size:14px;" data-en="Shops Near You (10km)" data-hi="आपके नजदीक दुकानें (10km)">Shops Near You (10km)</h3>
+                </div>
+                <div id="nearby-shops-list" class="service-centers-list" style="padding-top:0;"></div>
+                <div class="panel-subheader" style="padding:12px 16px 8px 16px; border-bottom:none; margin-top:4px;">
+                  <i data-lucide="database" class="subheader-icon text-cyan" style="width:16px;height:16px;"></i>
+                  <h3 style="font-size:14px;" data-en="Suggested Centers" data-hi="सुझाव केंद्र">Suggested Centers</h3>
+                </div>
+              </div>
+
               <div class="service-centers-list" id="service-centers-list">
                 <!-- Map shops loaded via JS -->
               </div>
@@ -601,18 +627,18 @@
       <div class="modal-header">
         <div class="modal-title">
           <i data-lucide="key"></i>
-          <h3>Gemini API Key</h3>
+          <h3>AI API Key</h3>
         </div>
         <button id="close-modal-btn" class="drawer-close-btn" aria-label="Close">
           <i data-lucide="x"></i>
         </button>
       </div>
       <div class="modal-body">
-        <p class="modal-desc">Enter your Google Gemini API key to enable AI-powered diagnostics. Your key is stored locally in your browser only.</p>
+        <p class="modal-desc">Enter your Groq API key to enable AI-powered diagnostics. Your key is only stored in current session memory.</p>
         <div class="modal-input-group">
           <label class="form-label">API Key</label>
           <div class="api-key-input-wrap">
-            <input type="password" id="gemini-api-key-input" class="form-input" placeholder="AIza...">
+            <input type="password" id="gemini-api-key-input" class="form-input" placeholder="gsk_...">
             <button type="button" id="toggle-key-visibility" class="voice-btn" title="Show/Hide Key">
               <i data-lucide="eye" id="eye-icon"></i>
             </button>
@@ -621,7 +647,7 @@
         <div class="modal-status" id="api-key-status"></div>
       </div>
       <div class="modal-footer">
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn btn-secondary" style="font-size:13px;">
+        <a href="https://console.groq.com/keys" target="_blank" class="btn btn-secondary" style="font-size:13px;">
           <i data-lucide="external-link"></i>
           Get Free API Key
         </a>

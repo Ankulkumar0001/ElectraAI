@@ -15,7 +15,8 @@ const AppState = {
   voiceRecognition: null,
   isListening: false,
   history: [],
-  geminiApiKey: ''
+  geminiApiKey: '',
+  userLocation: null
 };
 
 // --- Language Dictionary (English & Hindi) ---
@@ -206,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initChatEngine();
   initHistoryHandler();
   initApiKeyModal();
+  initLocationHandler();
   lucide.createIcons();
 });
 
@@ -648,58 +650,33 @@ function initApiKeyModal() {
   });
 }
 
-// --- Gemini API Call ---
+// --- Groq API Call ---
 async function callGeminiAPI(brand, model, year, errCode, description, symptoms, deviceType) {
   const apiKey = AppState.geminiApiKey;
-
-  if (!apiKey) {
-    throw new Error('NO_API_KEY');
-  }
+  if (!apiKey) throw new Error('NO_API_KEY');
 
   const lang = AppState.currentLang;
-  const langInstruction = lang === 'HI'
-    ? 'Respond in Hindi language only.'
-    : 'Respond in English language only.';
-
+  const langInstruction = lang === 'HI' ? 'Respond in Hindi language only.' : 'Respond in English language only.';
   const descTrimmed = description ? description.slice(0, 200) : '';
-  const prompt = `Electronics repair AI. Diagnose this device. ${langInstruction}
-Device:${deviceType} Brand:${brand} Model:${model} Year:${year||'?'} Error:${errCode||'none'} Symptoms:${symptoms.join(',')} Desc:${descTrimmed}
-Reply ONLY valid JSON, no markdown:
-{"severity":"critical|moderate|minor","summary":"...","issues":[{"name":"...","confidence":90,"type":"diy|tech","cost":"₹500-2000","parts":"...","time":"30 Mins","desc":"...","suggestions":"step1. step2."}],"chat_welcome":"..."}`;
 
-  const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+  const messages = [
+    { role: 'system', content: `Electronics repair diagnostic AI. ${langInstruction} Reply ONLY valid JSON, no markdown: {"severity":"critical|moderate|minor","summary":"...","issues":[{"name":"...","confidence":90,"type":"diy|tech","cost":"\u20b9500-2000","parts":"...","time":"30 Mins","desc":"...","suggestions":"step1. step2."}],"chat_welcome":"..."}` },
+    { role: 'user', content: `Device:${deviceType} Brand:${brand} Model:${model} Year:${year||'?'} Error:${errCode||'none'} Symptoms:${symptoms.join(',')} Desc:${descTrimmed}` }
+  ];
 
-  // Attach images if uploaded
-  if (AppState.uploadedImages.length > 0) {
-    const imageParts = AppState.uploadedImages.slice(0, 4).map(dataUrl => {
-      const [meta, base64data] = dataUrl.split(',');
-      const mimeType = meta.match(/:(.*?);/)[1];
-      return { inline_data: { mime_type: mimeType, data: base64data } };
-    });
-    contents[0].parts.unshift(
-      { text: 'Also analyze these device images for visible damage, error screens, or hardware issues:' },
-      ...imageParts
-    );
-  }
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents })
-    }
-  );
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages, max_tokens: 1000 })
+  });
 
   if (!response.ok) {
     const err = await response.json();
-    throw new Error(err?.error?.message || 'Gemini API error');
+    throw new Error(err?.error?.message || 'Groq API error');
   }
 
   const data = await response.json();
-  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-  // Strip markdown code fences if present
+  const rawText = data.choices?.[0]?.message?.content || '';
   const cleaned = rawText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim();
   return JSON.parse(cleaned);
 }
@@ -890,6 +867,13 @@ async function compileDiagnosticsData() {
     renderChatSuggestions();
   } else {
     triggerBotWelcome(brand, model);
+  }
+
+  // Fetch nearby shops if location available
+  if (AppState.userLocation) {
+    fetchNearbyShops(AppState.userLocation.lat, AppState.userLocation.lng)
+      .then(shops => renderNearbyShops(shops, AppState.userLocation.lat, AppState.userLocation.lng))
+      .catch(() => {});
   }
 
   lucide.createIcons();
@@ -1096,22 +1080,26 @@ async function processChatResponse(query) {
     const issueContext = mainIssue ? `Issue:${mainIssue.name}. ${mainIssue.desc?.slice(0,100)}.` : '';
     const prompt = `ElectraAI repair chatbot. Device:${AppState.selectedDevice} Brand:${brand} Model:${model}. ${issueContext} ${langInstruction} User:"${query.slice(0,150)}" Reply concise plain text.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] })
-      }
-    );
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: `ElectraAI repair chatbot. Device:${AppState.selectedDevice} Brand:${brand} Model:${model}. ${issueContext} ${langInstruction}` },
+          { role: 'user', content: query.slice(0, 150) }
+        ],
+        max_tokens: 300
+      })
+    });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data?.error?.message || 'Gemini API error');
+      throw new Error(data?.error?.message || 'OpenAI API error');
     }
 
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const reply = data.choices?.[0]?.message?.content?.trim();
     if (!reply) throw new Error('empty_response');
 
     document.getElementById(typingId)?.remove();
@@ -1187,20 +1175,23 @@ function initHistoryHandler() {
 }
 
 function saveRecordToHistory(record) {
-  // Unshift to place new record at the top
   AppState.history.unshift(record);
-  
-  // Limit storage capacity
-  if (AppState.history.length > 25) {
-    AppState.history.pop();
-  }
-  
+  if (AppState.history.length > 25) AppState.history.pop();
   try {
     localStorage.setItem('electra_history', JSON.stringify(AppState.history));
   } catch (e) {
     console.error("Failed to save history to localStorage:", e);
   }
   updateHistoryBadge();
+}
+
+function deleteHistoryRecord(id) {
+  AppState.history = AppState.history.filter(r => r.id !== id);
+  try {
+    localStorage.setItem('electra_history', JSON.stringify(AppState.history));
+  } catch (e) {}
+  updateHistoryBadge();
+  loadHistoryList();
 }
 
 function updateHistoryBadge() {
@@ -1237,6 +1228,7 @@ function loadHistoryList() {
     card.className = 'history-item-card';
     
     const viewBtnText = AppState.currentLang === 'HI' ? 'विवरण देखें' : 'View Details';
+    const deleteBtnText = AppState.currentLang === 'HI' ? 'हटाएं' : 'Delete';
     const severityLabel = LangDictionary[AppState.currentLang][`${record.severity}_fault`] || record.severity;
     
     card.innerHTML = `
@@ -1254,17 +1246,20 @@ function loadHistoryList() {
       </div>
       <div class="history-item-actions">
         <span class="history-item-badge ${record.severity}">${severityLabel}</span>
-        <button class="history-view-btn" data-id="${record.id}">
-          <i data-lucide="eye" style="width:12px; height:12px;"></i>
-          <span>${viewBtnText}</span>
-        </button>
+        <div style="display:flex;gap:6px;">
+          <button class="history-view-btn" data-id="${record.id}">
+            <i data-lucide="eye" style="width:12px; height:12px;"></i>
+            <span>${viewBtnText}</span>
+          </button>
+          <button class="history-delete-btn" data-id="${record.id}" title="${deleteBtnText}">
+            <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+          </button>
+        </div>
       </div>
     `;
     
-    const viewBtn = card.querySelector('.history-view-btn');
-    viewBtn.addEventListener('click', () => {
-      viewPastRecord(record.id);
-    });
+    card.querySelector('.history-view-btn').addEventListener('click', () => viewPastRecord(record.id));
+    card.querySelector('.history-delete-btn').addEventListener('click', () => deleteHistoryRecord(record.id));
 
     container.appendChild(card);
   });
@@ -1456,4 +1451,119 @@ function viewPastRecord(id) {
 
   lucide.createIcons();
   updateLanguageTexts();
+}
+
+// --- Location Handler ---
+function initLocationHandler() {
+  const btn = document.getElementById('share-location-btn');
+  const statusText = document.getElementById('location-status-text');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      statusText.textContent = AppState.currentLang === 'HI' ? 'Location support nahi hai.' : 'Geolocation not supported.';
+      return;
+    }
+
+    btn.disabled = true;
+    statusText.textContent = AppState.currentLang === 'HI' ? 'Location dhundh raha hai...' : 'Fetching location...';
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        AppState.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        btn.innerHTML = '<i data-lucide="check-circle"></i> <span>' + (AppState.currentLang === 'HI' ? 'Location मिल गई' : 'Location Captured') + '</span>';
+        btn.style.borderColor = 'var(--color-success)';
+        btn.style.color = 'var(--color-success)';
+        statusText.textContent = AppState.currentLang === 'HI'
+          ? `📍 ${AppState.userLocation.lat.toFixed(4)}, ${AppState.userLocation.lng.toFixed(4)}`
+          : `📍 ${AppState.userLocation.lat.toFixed(4)}, ${AppState.userLocation.lng.toFixed(4)}`;
+        lucide.createIcons();
+      },
+      () => {
+        btn.disabled = false;
+        statusText.textContent = AppState.currentLang === 'HI' ? '❌ Location access denied.' : '❌ Location access denied.';
+      },
+      { timeout: 10000 }
+    );
+  });
+}
+
+// --- Fetch Nearby Shops via OpenStreetMap Overpass API ---
+async function fetchNearbyShops(lat, lng) {
+  const radius = 10000; // 10km in meters
+  const query = `
+    [out:json][timeout:15];
+    (
+      node["shop"="electronics"](around:${radius},${lat},${lng});
+      node["shop"="mobile_phone"](around:${radius},${lat},${lng});
+      node["shop"="computer"](around:${radius},${lat},${lng});
+      node["repair"="electronics"](around:${radius},${lat},${lng});
+    );
+    out body 10;
+  `;
+
+  const res = await fetch('https://overpass-api.de/api/interpreter', {
+    method: 'POST',
+    body: query
+  });
+
+  const data = await res.json();
+  return data.elements || [];
+}
+
+function renderNearbyShops(shops, lat, lng) {
+  const container = document.getElementById('nearby-shops-container');
+  const list = document.getElementById('nearby-shops-list');
+  if (!container || !list) return;
+
+  if (shops.length === 0) {
+    container.style.display = 'block';
+    list.innerHTML = `<p style="font-size:12px; color:var(--text-muted); padding:0 16px 12px;">
+      ${AppState.currentLang === 'HI' ? '10km में कोई दुकान नहीं मिली।' : 'No shops found within 10km.'}
+    </p>`;
+    lucide.createIcons();
+    return;
+  }
+
+  container.style.display = 'block';
+  list.innerHTML = '';
+
+  shops.forEach(shop => {
+    const name = shop.tags?.name || (AppState.currentLang === 'HI' ? 'इलेक्ट्रॉनिक्स शॉप' : 'Electronics Shop');
+    const addr = shop.tags?.['addr:street'] || shop.tags?.['addr:full'] || '';
+    const phone = shop.tags?.phone || shop.tags?.['contact:phone'] || '';
+
+    // Calculate distance
+    const dist = getDistanceKm(lat, lng, shop.lat, shop.lon);
+    const mapsUrl = `https://www.google.com/maps?q=${shop.lat},${shop.lon}`;
+
+    const card = document.createElement('div');
+    card.className = 'center-card';
+    card.innerHTML = `
+      <div class="center-title-bar">
+        <h4 class="center-name">${name}</h4>
+        <span class="center-rating" style="background:var(--color-info-bg); color:var(--color-info);">
+          <i data-lucide="navigation"></i> ${dist} km
+        </span>
+      </div>
+      ${addr ? `<div class="center-info-row"><i data-lucide="map-pin"></i><span>${addr}</span></div>` : ''}
+      ${phone ? `<div class="center-info-row"><i data-lucide="phone"></i><a href="tel:${phone}" class="shop-call-link">${phone} <i data-lucide="phone-call" style="width:11px;height:11px;"></i></a></div>` : ''}
+      <div class="center-action-row">
+        <a href="${mapsUrl}" target="_blank" class="center-book-btn" style="text-decoration:none;">
+          <i data-lucide="map" style="width:11px;height:11px;"></i>
+          ${AppState.currentLang === 'HI' ? 'Maps पर देखें' : 'View on Maps'}
+        </a>
+      </div>`;
+    list.appendChild(card);
+  });
+
+  lucide.createIcons();
+}
+
+function getDistanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2) ** 2;
+  return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
 }
