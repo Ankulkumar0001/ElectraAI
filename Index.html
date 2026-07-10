@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElectraAI - Advanced Electronics Diagnostic System</title>
+  <meta name="description" content="AI-powered diagnostic tool for electronics repair, troubleshooting suggestions, cost estimators, and technician matching.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="Index.css?v=4">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Background Decorative Orbs -->
+  <div class="decor-orb orb-1"></div>
+  <div class="decor-orb orb-2"></div>
+  <div class="decor-orb orb-3"></div>
+
+  <!-- Header Section -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-icon">
+          <i data-lucide="cpu"></i>
+        </div>
+        <div class="brand-text">
+          <h1 class="logo-title">Electra<span class="highlight">AI</span></h1>
+          <p class="logo-subtitle" data-en="Diagnostics & Repair System" data-hi="डायग्नोस्टिक्स और मरम्मत प्रणाली">Diagnostics & Repair System</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Language Switcher -->
+        <button id="lang-toggle-btn" class="header-btn" aria-label="Toggle Language" title="Translate UI">
+          <i data-lucide="languages"></i>
+          <span id="current-lang">EN</span>
+        </button>
+        <!-- History Toggle Button -->
+        <button id="history-toggle-btn" class="header-btn" aria-label="View History" title="Diagnostic History">
+          <i data-lucide="history"></i>
+          <span class="history-badge-count" id="history-badge-count" style="display:none;">0</span>
+        </button>
+        <!-- Theme Toggle -->
+        <button id="theme-toggle-btn" class="header-btn" aria-label="Toggle Theme" title="Toggle Theme Mode">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+        <!-- API Key Settings -->
+        <button id="api-settings-btn" class="header-btn" aria-label="API Settings" title="Gemini API Key Settings">
+          <i data-lucide="settings"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-main">
+    <div class="main-container">
+      
+      <!-- Stepper Progress Header -->
+      <section class="stepper-progress-wrapper" id="stepper-header-section">
+        <div class="stepper-progress">
+          <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          
+          <div class="step-indicator active" data-step="1">
+            <div class="step-num"><i data-lucide="layers"></i></div>
+            <span class="step-label" data-en="Device" data-hi="उपकरण">Device</span>
+          </div>
+          <div class="step-indicator" data-step="2">
+            <div class="step-num"><i data-lucide="file-text"></i></div>
+            <span class="step-label" data-en="Details" data-hi="विवरण">Details</span>
+          </div>
+          <div class="step-indicator" data-step="3">
+            <div class="step-num"><i data-lucide="image"></i></div>
+            <span class="step-label" data-en="Media" data-hi="तस्वीरें">Media</span>
+          </div>
+          <div class="step-indicator" data-step="4">
+            <div class="step-num"><i data-lucide="activity"></i></div>
+            <span class="step-label" data-en="Analysis" data-hi="विश्लेषण">Analysis</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 1: DEVICE TYPE SELECTION -->
+      <section id="step-panel-1" class="step-panel active">
+        <div class="panel-header">
+          <h2 class="section-title" data-en="Select Your Device" data-hi="अपना उपकरण चुनें">Select Your Device</h2>
+          <p class="section-desc" data-en="Choose the category of electronics device facing issues." data-hi="समस्या का सामना कर रहे इलेक्ट्रॉनिक्स उपकरण की श्रेणी चुनें।">Choose the category of electronics device facing issues.</p>
+        </div>
+        <div class="device-grid" id="device-selection-grid">
+          <!-- Laptop Card -->
+          <button class="device-card" data-device="laptop">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="laptop"></i></div>
+            <h3 class="device-name" data-en="Laptop" data-hi="लैपटॉप">Laptop</h3>
+            <p class="device-desc" data-en="HP, Dell, Apple, Lenovo, ASUS" data-hi="एचपी, डेल, एप्पल, लेनोवो, आसुस">HP, Dell, Apple, Lenovo, ASUS</p>
+          </button>
+          <!-- Mobile Card -->
+          <button class="device-card" data-device="mobile">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="smartphone"></i></div>
+            <h3 class="device-name" data-en="Smart Phone" data-hi="स्मार्टफोन">Smart Phone</h3>
+            <p class="device-desc" data-en="iPhone, Samsung, OnePlus, Xiaomi" data-hi="आईफोन, सैमसंग, वनप्लस, शाओमी">iPhone, Samsung, OnePlus, Xiaomi</p>
+          </button>
+          <!-- TV Card -->
+          <button class="device-card" data-device="tv">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="tv"></i></div>
+            <h3 class="device-name" data-en="Television (TV)" data-hi="टेलीविजन (टीवी)">Television (TV)</h3>
+            <p class="device-desc" data-en="Smart TVs, LED, OLED, LCD Panels" data-hi="स्मार्ट टीवी, एलइडी, ओलेड, एलसीडी पैनल">Smart TVs, LED, OLED, LCD Panels</p>
+          </button>
+          <!-- Refrigerator Card -->
+          <button class="device-card" data-device="refrigerator">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="snowflake"></i></div>
+            <h3 class="device-name" data-en="Refrigerator" data-hi="फ्रिज / रेफ्रिजरेटर">Refrigerator</h3>
+            <p class="device-desc" data-en="Single/Double Door, Inverter Compressor" data-hi="सिंगल/डबल डोर, इन्वर्टर कंप्रेसर">Single/Double Door, Inverter Compressor</p>
+          </button>
+          <!-- AC Card -->
+          <button class="device-card" data-device="ac">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="wind"></i></div>
+            <h3 class="device-name" data-en="Air Conditioner (AC)" data-hi="एयर कंडीशनर (एसी)">Air Conditioner (AC)</h3>
+            <p class="device-desc" data-en="Split AC, Window AC, Inverter Units" data-hi="स्प्लिट एसी, विंडो एसी, इन्वर्टर यूनिट">Split AC, Window AC, Inverter Units</p>
+          </button>
+          <!-- Washing Machine Card -->
+          <button class="device-card" data-device="washing_machine">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="washing-machine" class="custom-lucide-fallback-wm">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-washing-machine"><path d="M3 6h18"/><path d="M19 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/><path d="M12 18a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M8 6h.01"/><path d="M16 6h.01"/></svg>
+            </i></div>
+            <h3 class="device-name" data-en="Washing Machine" data-hi="वॉशिंग मशीन">Washing Machine</h3>
+            <p class="device-desc" data-en="Front Load, Top Load, Semi-Auto" data-hi="फ्रंट लोड, टॉप लोड, सेमी-ऑटो">Front Load, Top Load, Semi-Auto</p>
+          </button>
+          <!-- Printer Card -->
+          <button class="device-card" data-device="printer">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="printer"></i></div>
+            <h3 class="device-name" data-en="Printer" data-hi="प्रिंटर">Printer</h3>
+            <p class="device-desc" data-en="LaserJet, InkTank, Thermal Printers" data-hi="लेज़रजेट, इंकटैंक, थर्मल प्रिंटर">LaserJet, InkTank, Thermal Printers</p>
+          </button>
+          <!-- Router Card -->
+          <button class="device-card" data-device="router">
+            <div class="card-glow"></div>
+            <div class="device-icon"><i data-lucide="wifi"></i></div>
+            <h3 class="device-name" data-en="Wi-Fi Router" data-hi="वाई-फाई राउटर">Wi-Fi Router</h3>
+            <p class="device-desc" data-en="Broadband, Dual-band Modems" data-hi="ब्रॉडबैंड, डुअल-बैंड मोडेम">Broadband, Dual-band Modems</p>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2: DEVICE DETAILS FORM -->
+      <section id="step-panel-2" class="step-panel">
+        <div class="panel-header">
+          <h2 class="section-title" data-en="Provide Device Information" data-hi="उपकरण की जानकारी प्रदान करें">Provide Device Information</h2>
+          <p class="section-desc" data-en="Fill in specification details and symptoms to analyze the root cause." data-hi="मूल कारण का विश्लेषण करने के लिए विशिष्टता विवरण और लक्षण भरें।">Fill in specification details and symptoms to analyze the root cause.</p>
+        </div>
+        
+        <form id="device-details-form" class="glass-panel form-grid" novalidate>
+          <!-- Brand -->
+          <div class="form-group">
+            <label for="device-brand" class="form-label" data-en="Brand Name" data-hi="ब्रांड का नाम">Brand Name *</label>
+            <input type="text" id="device-brand" class="form-input" placeholder="e.g. HP, Samsung, LG" required>
+            <div class="invalid-feedback" data-en="Please enter the brand name." data-hi="कृपया ब्रांड का नाम दर्ज करें।">Please enter the brand name.</div>
+          </div>
+          
+          <!-- Model -->
+          <div class="form-group">
+            <label for="device-model" class="form-label" data-en="Model Number" data-hi="मॉडल नंबर">Model Number *</label>
+            <input type="text" id="device-model" class="form-input" placeholder="e.g. Pavilion 15, Galaxy S23, Nanocell 80" required>
+            <div class="invalid-feedback" data-en="Please enter the model number." data-hi="कृपया मॉडल नंबर दर्ज करें।">Please enter the model number.</div>
+          </div>
+
+          <!-- Purchase Year -->
+          <div class="form-group">
+            <label for="device-year" class="form-label" data-en="Purchase Year" data-hi="खरीद का वर्ष">Purchase Year</label>
+            <input type="number" id="device-year" class="form-input" min="2000" max="2026" placeholder="e.g. 2023">
+          </div>
+
+          <!-- Error Code (Optional) -->
+          <div class="form-group">
+            <label for="device-error-code" class="form-label" data-en="Error Code (If any)" data-hi="त्रुटि कोड / एरर कोड (यदि उपलब्ध हो)">Error Code (If any)</label>
+            <input type="text" id="device-error-code" class="form-input" placeholder="e.g. 0x0000007B, PE Error, code 3E">
+          </div>
+
+          <!-- Dynamic Symptoms Section (Full Width) -->
+          <div class="form-group col-span-full">
+            <label class="form-label" data-en="Select Device Symptoms" data-hi="उपकरण के लक्षण चुनें">Select Device Symptoms *</label>
+            <p class="symptoms-helper-text" data-en="Check all that apply to your device." data-hi="वे सभी विकल्प चुनें जो आपके उपकरण पर लागू होते हैं।">Check all that apply to your device.</p>
+            <div class="symptoms-grid" id="dynamic-symptoms-container">
+              <!-- Dynamically populated via JavaScript -->
+            </div>
+            <div class="invalid-feedback symptoms-error" id="symptoms-validation-msg" data-en="Please select at least one symptom." data-hi="कृपया कम से कम एक लक्षण चुनें।">Please select at least one symptom.</div>
+          </div>
+
+          <!-- Problem Description (Full Width) -->
+          <div class="form-group col-span-full">
+            <label for="device-description" class="form-label" data-en="Describe the Issue" data-hi="समस्या का वर्णन करें">Describe the Issue *</label>
+            <div class="textarea-wrapper">
+              <textarea id="device-description" class="form-input form-textarea" rows="4" placeholder="Tell us what is wrong. Example: The power button lights up but the display remains completely black and there are no beep sounds..." required></textarea>
+              <!-- Voice Input Button -->
+              <button type="button" id="voice-input-btn" class="voice-btn" title="Speak problem description" aria-label="Voice Input">
+                <i data-lucide="mic"></i>
+                <span class="voice-status-dot"></span>
+              </button>
+            </div>
+            <div class="invalid-feedback" data-en="Please describe the issue in detail." data-hi="कृपया समस्या का विस्तार से वर्णन करें।">Please describe the issue in detail.</div>
+            <div class="voice-transcript-info" id="voice-transcript-info">
+              <i data-lucide="info" class="inline-icon"></i>
+              <span id="voice-transcript-msg"></span>
+            </div>
+          </div>
+        </form>
+
+        <!-- Form Stepper Navigation -->
+        <div class="stepper-actions">
+          <button type="button" class="btn btn-secondary back-btn-trigger">
+            <i data-lucide="arrow-left"></i>
+            <span data-en="Back" data-hi="पीछे जाएं">Back</span>
+          </button>
+          <button type="button" class="btn btn-primary" id="submit-step-2-btn">
+            <span data-en="Continue" data-hi="आगे बढ़ें">Continue</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 3: IMAGE UPLOAD -->
+      <section id="step-panel-3" class="step-panel">
+        <div class="panel-header">
+          <h2 class="section-title" data-en="Upload Device Media" data-hi="उपकरण की तस्वीरें अपलोड करें">Upload Device Media</h2>
+          <p class="section-desc" data-en="Upload photos of the device, error screens, or damaged parts for AI visual diagnosis (Optional but recommended)." data-hi="AI विजुअल डायग्नोसिस के लिए डिवाइस, एरर स्क्रीन या क्षतिग्रस्त हिस्सों की तस्वीरें अपलोड करें (वैकल्पिक लेकिन अनुशंसित)।">Upload photos of the device, error screens, or damaged parts for AI visual diagnosis (Optional but recommended).</p>
+        </div>
+
+        <div class="glass-panel padding-large">
+          <!-- Dropzone -->
+          <div class="dropzone" id="media-dropzone">
+            <input type="file" id="media-file-input" multiple accept="image/*" class="dropzone-file-input">
+            <div class="dropzone-content">
+              <div class="dropzone-icon">
+                <i data-lucide="upload-cloud"></i>
+              </div>
+              <h3 data-en="Drag & Drop Images Here" data-hi="यहां चित्र खींचें और छोड़ें (Drag & Drop)">Drag & Drop Images Here</h3>
+              <p data-en="or click to browse local files (Supports JPEG, PNG, WEBP)" data-hi="या लोकल फाइलों को ब्राउज़ करने के लिए क्लिक करें (JPEG, PNG, WEBP सपोर्टेड)">or click to browse local files (Supports JPEG, PNG, WEBP)</p>
+            </div>
+          </div>
+
+          <!-- Previews grid -->
+          <div class="upload-previews-container" id="upload-previews-container">
+            <!-- Uploaded card previews will go here -->
+          </div>
+
+          <!-- Upload Helper Cards -->
+          <div class="media-helper-grid">
+            <div class="helper-card">
+              <i data-lucide="monitor"></i>
+              <h4 data-en="Device Screen" data-hi="डिवाइस स्क्रीन">Device Screen</h4>
+              <p data-en="Upload photos showing screen glitches, colors, or power LED states." data-hi="स्क्रीन की खराबी, रंग या पावर एलईडी लाइट दिखाने वाली फोटो अपलोड करें।">Upload photos showing screen glitches, colors, or power LED states.</p>
+            </div>
+            <div class="helper-card">
+              <i data-lucide="hash"></i>
+              <h4 data-en="Error / Serial Codes" data-hi="त्रुटि / सीरियल कोड">Error / Serial Codes</h4>
+              <p data-en="Capture error messages on panel screens or manufacturer labeling." data-hi="पैनल स्क्रीन या निर्माता लेबलिंग पर लिखे त्रुटि संदेशों को कैप्चर करें।">Capture error messages on panel screens or manufacturer labeling.</p>
+            </div>
+            <div class="helper-card">
+              <i data-lucide="circuit-board"></i>
+              <h4 data-en="Internal Board / PCB (Optional)" data-hi="आंतरिक बोर्ड / पीसीबी (वैकल्पिक)">Internal Board / PCB (Optional)</h4>
+              <p data-en="Submit closeups of blown capacitors, burnt resistors, or water stains." data-hi="फटे कैपेसिटर, जले हुए प्रतिरोधक (resistors), या पानी के दागों के क्लोज़अप सबमिट करें।">Submit closeups of blown capacitors, burnt resistors, or water stains.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Media Stepper Navigation -->
+        <div class="stepper-actions">
+          <button type="button" class="btn btn-secondary back-btn-trigger">
+            <i data-lucide="arrow-left"></i>
+            <span data-en="Back" data-hi="पीछे जाएं">Back</span>
+          </button>
+          <button type="button" class="btn btn-primary" id="start-diagnosis-btn">
+            <span data-en="Run AI Diagnostic" data-hi="AI डायग्नोसिस शुरू करें">Run AI Diagnostic</span>
+            <i data-lucide="sparkles"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 4: ANALYSIS RUNNING & LOADING -->
+      <section id="step-panel-4" class="step-panel">
+        <div class="glass-panel text-center padding-large relative overflow-hidden">
+          <div class="analysis-scanner-wrap" id="analysis-scanner-wrap">
+            <!-- Simulated laser scan target images shown dynamically -->
+            <div class="scanner-grid" id="scanner-grid-previews"></div>
+            <!-- Horizontal moving laser line -->
+            <div class="laser-scanner-line"></div>
+          </div>
+
+          <div class="spinner-box">
+            <div class="circle-border">
+              <div class="circle-core"></div>
+            </div>
+          </div>
+
+          <h2 class="analysis-status-title" data-en="System Analysis in Progress" data-hi="सिस्टम विश्लेषण प्रगति पर है">System Analysis in Progress</h2>
+          
+          <div class="progress-bar-container">
+            <div class="progress-bar-glow" id="analysis-progress-bar"></div>
+          </div>
+
+          <div class="status-ticker-wrapper">
+            <ul class="status-ticker-list" id="status-ticker-list">
+              <li class="ticker-item active" data-en="Parsing device diagnostics..." data-hi="डिवाइस डायग्नोस्टिक्स पार्स किया जा रहा है...">Parsing device diagnostics...</li>
+              <li class="ticker-item" data-en="Deconstructing symptoms profile..." data-hi="लक्षणों के विवरण का विश्लेषण किया जा रहा है...">Deconstructing symptoms profile...</li>
+              <li class="ticker-item" data-en="Analyzing image file pixels & boards..." data-hi="इमेज फाइल पिक्सल और बोर्ड का विश्लेषण किया जा रहा है...">Analyzing image file pixels & boards...</li>
+              <li class="ticker-item" data-en="Searching matching fault code indexes..." data-hi="मैचिंग फॉल्ट कोड इंडेक्स खोजे जा रहे हैं...">Searching matching fault code indexes...</li>
+              <li class="ticker-item" data-en="Generating repair suggestions & cost brackets..." data-hi="मरम्मत के सुझाव और लागत कोष्टक तैयार किए जा रहे हैं...">Generating repair suggestions & cost brackets...</li>
+              <li class="ticker-item" data-en="Compiling final diagnostics matrix..." data-hi="अंतिम डायग्नोस्टिक्स मैट्रिक्स को संकलित किया जा रहा है...">Compiling final diagnostics matrix...</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS PANEL (STEP 5) -->
+      <section id="step-panel-results" class="results-dashboard">
+        
+        <!-- Results Header Overview -->
+        <div class="results-header-summary glass-panel">
+          <div class="summary-meta">
+            <div class="summary-badge" id="result-status-badge">
+              <i data-lucide="alert-triangle"></i>
+              <span id="result-summary-severity">Critical Fault Detected</span>
+            </div>
+            <div class="summary-device-info">
+              <span class="meta-label" data-en="Device Model:" data-hi="उपकरण मॉडल:">Device Model:</span>
+              <strong id="result-model-text">HP Pavilion 15</strong>
+            </div>
+            <div class="summary-device-info">
+              <span class="meta-label" data-en="Diagnostics Date:" data-hi="जांच की तारीख:">Diagnostics Date:</span>
+              <strong id="result-date-text">July 10, 2026</strong>
+            </div>
+          </div>
+          <div class="summary-actions">
+            <!-- Print PDF Invoice Report -->
+            <button class="btn btn-secondary btn-icon-only" id="print-diagnosis-report" title="Print Diagnostics Receipt">
+              <i data-lucide="printer"></i>
+              <span data-en="Print / PDF" data-hi="प्रिंट / पीडीएफ">Print / PDF</span>
+            </button>
+            <button class="btn btn-primary" id="restart-diagnostic-btn">
+              <i data-lucide="refresh-cw"></i>
+              <span data-en="New Analysis" data-hi="नई जांच">New Analysis</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          
+          <!-- LEFT COLUMN: Diagnostic Findings -->
+          <div class="dashboard-main-col">
+            
+            <!-- Fault analysis listing card -->
+            <div class="glass-panel diagnostic-card">
+              <div class="panel-subheader">
+                <i data-lucide="search" class="subheader-icon text-cyan"></i>
+                <h3 data-en="Diagnostic Findings" data-hi="जांच के निष्कर्ष">Diagnostic Findings</h3>
+              </div>
+              <div class="issues-list" id="diagnostic-issues-list">
+                <!-- Dynamically generated visual issues -->
+              </div>
+            </div>
+
+            <!-- Cost Estimates Dashboard -->
+            <div class="glass-panel pricing-card">
+              <div class="panel-subheader">
+                <i data-lucide="banknote" class="subheader-icon text-green"></i>
+                <h3 data-en="Repair Cost Breakdown" data-hi="मरम्मत लागत विवरण">Repair Cost Breakdown</h3>
+              </div>
+              
+              <div class="cost-summary-flex">
+                <div class="cost-stat">
+                  <span class="cost-stat-label" data-en="Minimum Estimated Cost" data-hi="न्यूनतम अनुमानित लागत">Minimum Estimated Cost</span>
+                  <div class="cost-stat-val" id="min-cost-val">₹0</div>
+                </div>
+                <div class="cost-separator"><i data-lucide="arrow-right"></i></div>
+                <div class="cost-stat">
+                  <span class="cost-stat-label" data-en="Maximum Estimated Cost" data-hi="अधिकतम अनुमानित लागत">Maximum Estimated Cost</span>
+                  <div class="cost-stat-val text-yellow" id="max-cost-val">₹0</div>
+                </div>
+              </div>
+
+              <!-- Pure CSS/JS Visual range bar chart -->
+              <div class="cost-range-bar-wrapper">
+                <div class="range-labels">
+                  <span data-en="Low Cost" data-hi="कम लागत">Low Cost</span>
+                  <span data-en="Moderate" data-hi="मध्यम">Moderate</span>
+                  <span data-en="High Repair" data-hi="उच्च मरम्मत">High Repair</span>
+                </div>
+                <div class="range-bar-track">
+                  <div class="range-bar-active" id="cost-range-active-indicator"></div>
+                </div>
+              </div>
+
+              <!-- Cost breakdown table of parts -->
+              <div class="parts-table-wrapper">
+                <table class="parts-table">
+                  <thead>
+                    <tr>
+                      <th data-en="Item / Component" data-hi="आइटम / घटक">Item / Component</th>
+                      <th data-en="Fault Confidence" data-hi="त्रुटि विश्वास स्तर">Fault Confidence</th>
+                      <th data-en="Estimated Cost" data-hi="अनुमानित लागत">Estimated Cost</th>
+                      <th data-en="Repair Time" data-hi="मरम्मत का समय">Repair Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="parts-cost-table-body">
+                    <!-- Loaded dynamically via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Step by Step troubleshooting guides -->
+            <div class="glass-panel diy-accordion-card">
+              <div class="panel-subheader">
+                <i data-lucide="shield-check" class="subheader-icon text-blue"></i>
+                <h3 data-en="Interactive Troubleshooting & Action Steps" data-hi="इंटरैक्टिव समस्या निवारण और उपाय">Interactive Troubleshooting & Action Steps</h3>
+              </div>
+              <div class="diy-steps-container" id="diy-action-steps-container">
+                <!-- Dynamically loaded instructions -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Interactive Chat & Service Directory -->
+          <div class="dashboard-side-col">
+            
+            <!-- AI Chat Assistant Panel -->
+            <div class="glass-panel chat-card">
+              <div class="panel-subheader border-bottom">
+                <div class="chat-header-info">
+                  <div class="chat-bot-avatar">
+                    <i data-lucide="bot"></i>
+                    <span class="online-indicator"></span>
+                  </div>
+                  <div>
+                    <h3 class="chat-bot-title">ElectraAI Assistant</h3>
+                    <p class="chat-bot-status" data-en="Ready to assist in English/Hindi" data-hi="अंग्रेजी/हिंदी में सहायता के लिए तैयार">Ready to assist in English/Hindi</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conversation Scroll Area -->
+              <div class="chat-messages-area" id="chat-messages-area">
+                <!-- Messages populated via JS -->
+              </div>
+
+              <!-- Action suggest chips -->
+              <div class="chat-suggestions-wrapper" id="chat-suggestions-container">
+                <!-- Suggested chips buttons -->
+              </div>
+
+              <!-- Chat Input Form -->
+              <form class="chat-input-bar" id="chat-input-form" autocomplete="off">
+                <input type="text" id="chat-user-message-input" placeholder="Ask details about this repair..." data-en-placeholder="Ask details about this repair..." data-hi-placeholder="इस मरम्मत के बारे में विवरण पूछें...">
+                <button type="submit" class="chat-send-btn" title="Send message" aria-label="Send Message">
+                  <i data-lucide="send"></i>
+                </button>
+              </form>
+            </div>
+
+            <!-- Service Centers Directory -->
+            <div class="glass-panel service-centers-card">
+              <div class="panel-subheader">
+                <i data-lucide="map-pin" class="subheader-icon text-red"></i>
+                <h3 data-en="Nearby Certified Repair Centers" data-hi="आसपास के प्रमाणित मरम्मत केंद्र">Nearby Certified Repair Centers</h3>
+              </div>
+              <p class="service-meta-text" data-en="Highly rated centers specializing in your device category." data-hi="आपके उपकरण की श्रेणी में विशेषज्ञता रखने वाले उच्च रेटेड केंद्र।">Highly rated centers specializing in your device category.</p>
+              
+              <div class="service-centers-list" id="service-centers-list">
+                <!-- Map shops loaded via JS -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- PRINT LAYOUT (INVOICE-LIKE TECHNICAL DIAGNOSIS SHEET) -->
+  <div id="technical-invoice-printout" class="print-only">
+    <div class="print-header">
+      <div class="print-logo">
+        <h2>ElectraAI DIAGNOSTIC REPORT</h2>
+        <p>Advanced Automation Testing & Visual Inspection Details</p>
+      </div>
+      <div class="print-meta-right">
+        <p><strong>Report Reference:</strong> #EA-<span id="print-ref-number">9823</span></p>
+        <p><strong>Date Generated:</strong> <span id="print-date-generated">2026-07-10</span></p>
+      </div>
+    </div>
+
+    <div class="print-divider"></div>
+
+    <div class="print-section">
+      <h3>1. Customer & Equipment Specs</h3>
+      <table class="print-table-narrow">
+        <tr>
+          <td><strong>Device Type:</strong></td>
+          <td id="print-device-type">-</td>
+          <td><strong>Brand Name:</strong></td>
+          <td id="print-brand-name">-</td>
+        </tr>
+        <tr>
+          <td><strong>Model Number:</strong></td>
+          <td id="print-model-num">-</td>
+          <td><strong>Purchase Year:</strong></td>
+          <td id="print-purchase-year">-</td>
+        </tr>
+        <tr>
+          <td><strong>Report Severity:</strong></td>
+          <td id="print-severity">-</td>
+          <td><strong>Error Code:</strong></td>
+          <td id="print-error-code">-</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="print-section">
+      <h3>2. Customer Statement & Symptoms</h3>
+      <p><strong>Problem Description:</strong> <span id="print-problem-desc">-</span></p>
+      <p><strong>Observed Symptoms:</strong> <span id="print-symptoms-list">-</span></p>
+    </div>
+
+    <div class="print-section">
+      <h3>3. Diagnostic Insights & Confidence matrix</h3>
+      <table class="print-data-table">
+        <thead>
+          <tr>
+            <th>Likely Issue</th>
+            <th>Confidence %</th>
+            <th>Difficulty Type</th>
+            <th>Price Category</th>
+            <th>Required Components</th>
+          </tr>
+        </thead>
+        <tbody id="print-issues-table-body">
+          <!-- Filled on print print trigger -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="print-section">
+      <h3>4. AI Repair Suggestions & Calibration Steps</h3>
+      <ol id="print-suggestions-ordered-list">
+        <!-- Filled on print print trigger -->
+      </ol>
+    </div>
+
+    <div class="print-section footer-notice">
+      <p>Disclaimer: This diagnosis was automatically calculated using AI vision recognition modeling and neural matching of manufacturer systems reports. Estimated cost figures represent common market prices inside India and are subject to technician verification.</p>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 ElectraAI System. All rights reserved.</p>
+      <p data-en="Designed for Professional Electronics Fault Detection" data-hi="पेशेवर इलेक्ट्रॉनिक्स खराबी का पता लगाने के लिए डिज़ाइन किया गया">Designed for Professional Electronics Fault Detection</p>
+    </div>
+  </footer>
+
+  <!-- Sliding History Drawer -->
+  <div id="history-drawer" class="history-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <i data-lucide="history" class="text-cyan"></i>
+        <h3 data-en="Diagnosis History" data-hi="जांच इतिहास">Diagnosis History</h3>
+      </div>
+      <button id="close-drawer-btn" class="drawer-close-btn" aria-label="Close History">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="drawer-content" id="history-list-container">
+      <!-- Dynamic list of past reports -->
+    </div>
+    <div class="drawer-footer">
+      <button id="clear-history-btn" class="btn btn-secondary btn-full-width" data-en="Clear All History" data-hi="सारा इतिहास साफ़ करें">Clear All History</button>
+    </div>
+  </div>
+  <div id="drawer-overlay" class="drawer-overlay"></div>
+
+  <!-- API Key Settings Modal -->
+  <div id="api-settings-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="key"></i>
+          <h3>Gemini API Key</h3>
+        </div>
+        <button id="close-modal-btn" class="drawer-close-btn" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Enter your Google Gemini API key to enable AI-powered diagnostics. Your key is stored locally in your browser only.</p>
+        <div class="modal-input-group">
+          <label class="form-label">API Key</label>
+          <div class="api-key-input-wrap">
+            <input type="password" id="gemini-api-key-input" class="form-input" placeholder="AIza...">
+            <button type="button" id="toggle-key-visibility" class="voice-btn" title="Show/Hide Key">
+              <i data-lucide="eye" id="eye-icon"></i>
+            </button>
+          </div>
+        </div>
+        <div class="modal-status" id="api-key-status"></div>
+      </div>
+      <div class="modal-footer">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn btn-secondary" style="font-size:13px;">
+          <i data-lucide="external-link"></i>
+          Get Free API Key
+        </a>
+        <button id="save-api-key-btn" class="btn btn-primary">
+          <i data-lucide="save"></i>
+          Save Key
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link Main JS -->
+  <script src="Index.js?v=4"></script>
+</body>
+</html>
