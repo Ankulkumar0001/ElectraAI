@@ -2,20 +2,21 @@
   "name": "ElectraAI - Electronics Diagnostic System",
   "short_name": "ElectraAI",
   "description": "AI-powered electronics diagnostic and repair assistant",
-  "start_url": "/",
+  "start_url": "./Index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#070c18",
   "theme_color": "#06b6d4",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "./icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "./icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -23,16 +24,10 @@
   ],
   "screenshots": [
     {
-      "src": "icons/icon-512.png",
+      "src": "./icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide"
     }
   ],
   "categories": ["utilities", "productivity"],

@@ -1,15 +1,14 @@
-const CACHE_NAME = 'electra-ai-v2';
+const CACHE_NAME = 'electra-ai-v1';
 const ASSETS = [
-  '/',
-  '/Index.html',
-  '/Index.css',
-  '/Index.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  './',
+  './Index.html',
+  './Index.css',
+  './Index.js',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
-// Install: cache all assets
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).catch(() => {})
@@ -17,7 +16,6 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Activate: remove old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -27,7 +25,6 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch: network first, fallback to cache
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
