@@ -2223,6 +2223,7 @@ body {
 .api-key-input-wrap {
   position: relative;
   display: flex;
+  align-items: center;
 }
 
 .api-key-input-wrap .form-input {
@@ -2231,6 +2232,14 @@ body {
   font-family: monospace;
   font-size: 13px;
   letter-spacing: 0.5px;
+}
+
+.api-key-input-wrap .voice-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  bottom: auto;
 }
 
 .modal-status {
