@@ -554,6 +554,7 @@ body {
   font-weight: 600;
   margin-bottom: 6px;
   z-index: 3;
+  color: var(--text-main);
 }
 
 .device-desc {
@@ -2549,6 +2550,7 @@ body {
 
   .device-name {
     font-size: 15px;
+    color: var(--text-main);
   }
 
   .stepper-progress .step-label {
@@ -2690,10 +2692,12 @@ body {
 
   .device-name {
     font-size: 13px;
+    color: var(--text-main);
   }
 
   .device-desc {
     font-size: 10px;
+    color: var(--text-muted);
   }
 
   .stepper-progress .step-label {
@@ -2911,6 +2915,7 @@ body {
     grid-column: 2;
     margin-bottom: 0;
     font-size: 15px;
+    color: var(--text-main);
   }
 
   .device-desc {

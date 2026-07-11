@@ -79,49 +79,294 @@ const DeviceSymptomsMap = {
     { label: { en: "Battery draining fast / Not charging", hi: "बैटरी तेजी से डिस्चार्ज / चार्ज न होना" }, val: "battery" },
     { label: { en: "Keyboard keys unresponsive", hi: "कीबोर्ड कीज काम नहीं कर रही हैं" }, val: "keyboard" },
     { label: { en: "System crash / Blue Screen (BSOD)", hi: "सिस्टम क्रैश / ब्लू स्क्रीन (BSOD)" }, val: "crash" },
-    { label: { en: "Beep sounds at bootup", hi: "चालू होने पर बीप की आवाजें आना" }, val: "beep" }
+    { label: { en: "Beep sounds at bootup", hi: "चालू होने पर बीप की आवाजें आना" }, val: "beep" },
+    { label: { en: "Laptop not turning on at all", hi: "लैपटॉप बिल्कुल चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Slow performance / Freezing", hi: "धीमा प्रदर्शन / फ्रीज होना" }, val: "slow" },
+    { label: { en: "Wi-Fi / Bluetooth not working", hi: "वाई-फाई / ब्लूटूथ काम नहीं कर रहा" }, val: "wifi" },
+    { label: { en: "Touchpad not responding", hi: "टचपैड काम नहीं कर रहा" }, val: "touchpad" },
+    { label: { en: "USB ports not detecting devices", hi: "USB पोर्ट डिवाइस नहीं पहचान रहा" }, val: "usb" },
+    { label: { en: "Hinges broken / Screen flickering", hi: "हिंज टूटा / स्क्रीन टिमटिमाना" }, val: "hinge" }
   ],
   mobile: [
     { label: { en: "Cracked screen / Unresponsive touch", hi: "टूटी स्क्रीन / टच काम न करना" }, val: "screen" },
     { label: { en: "Battery drainage / Overheating", hi: "तेजी से बैटरी खत्म होना / गर्म होना" }, val: "battery" },
     { label: { en: "Device boot loops / Won't turn on", hi: "बूट लूप / चालू न होना" }, val: "power" },
     { label: { en: "Speaker / Microphone muffling", hi: "स्पीकर / माइक में धुंधली आवाज" }, val: "sound" },
-    { label: { en: "Charging port loose / Water damage", hi: "चार्जिंग पोर्ट ढीला / पानी घुसना" }, val: "water" }
+    { label: { en: "Charging port loose / Water damage", hi: "चार्जिंग पोर्ट ढीला / पानी घुसना" }, val: "water" },
+    { label: { en: "Camera not working / Blurry photos", hi: "कैमरा काम नहीं कर रहा / धुंधली फोटो" }, val: "camera" },
+    { label: { en: "Network / SIM not detected", hi: "नेटवर्क / सिम नहीं मिल रहा" }, val: "network" },
+    { label: { en: "Face ID / Fingerprint not working", hi: "फेस आईडी / फिंगरप्रिंट काम नहीं कर रहा" }, val: "biometric" },
+    { label: { en: "Phone hanging / Very slow", hi: "फोन हैंग हो रहा / बहुत धीमा" }, val: "slow" },
+    { label: { en: "Vibration motor not working", hi: "वाइब्रेशन काम नहीं कर रहा" }, val: "vibration" },
+    { label: { en: "GPS / Location not accurate", hi: "GPS / लोकेशन सही नहीं आ रही" }, val: "gps" },
+    { label: { en: "Auto restart / Random shutdown", hi: "अपने आप रीस्टार्ट / बंद हो जाना" }, val: "restart" }
   ],
   tv: [
     { label: { en: "Screen shows lines / Cracked panel", hi: "स्क्रीन पर लाइनें / टूटा हुआ पैनल" }, val: "lines" },
     { label: { en: "No picture but audio works", hi: "चित्र नहीं आ रहा लेकिन आवाज चल रही है" }, val: "picture" },
     { label: { en: "HDMI or USB ports unresponsive", hi: "HDMI / USB पोर्ट काम नहीं कर रहे" }, val: "ports" },
-    { label: { en: "TV reboots on its own", hi: "टीवी अपने आप बार-बार बंद-चालू होना" }, val: "reboot" }
+    { label: { en: "TV reboots on its own", hi: "टीवी अपने आप बार-बार बंद-चालू होना" }, val: "reboot" },
+    { label: { en: "No sound / Distorted audio", hi: "आवाज नहीं / आवाज में गड़बड़ी" }, val: "audio" },
+    { label: { en: "Remote control not working", hi: "रिमोट कंट्रोल काम नहीं कर रहा" }, val: "remote" },
+    { label: { en: "TV not turning on", hi: "टीवी चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Backlight flickering / Dim screen", hi: "बैकलाइट टिमटिमाना / धुंधली स्क्रीन" }, val: "backlight" },
+    { label: { en: "Smart TV apps crashing / Slow", hi: "स्मार्ट टीवी ऐप्स क्रैश / धीमे" }, val: "smart" },
+    { label: { en: "Color distortion / Wrong colors", hi: "रंग गड़बड़ / गलत रंग आना" }, val: "color" }
   ],
   refrigerator: [
     { label: { en: "Not cooling properly", hi: "कूलिंग नहीं हो रही" }, val: "cooling" },
     { label: { en: "Excessive frost in freezer", hi: "फ्रीजर में बहुत अधिक बर्फ जमना" }, val: "frost" },
     { label: { en: "Water leaking on floor", hi: "नीचे से पानी लीक होना" }, val: "leak" },
-    { label: { en: "Compressor making loud humming noise", hi: "कंप्रेसर से तेज गुनगुनाहट की आवाज" }, val: "noise" }
+    { label: { en: "Compressor making loud humming noise", hi: "कंप्रेसर से तेज गुनगुनाहट की आवाज" }, val: "noise" },
+    { label: { en: "Fridge not turning on", hi: "फ्रिज चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Door seal / Gasket damaged", hi: "दरवाजे की सील / गास्केट खराब" }, val: "seal" },
+    { label: { en: "Ice maker not working", hi: "आइस मेकर काम नहीं कर रहा" }, val: "ice" },
+    { label: { en: "Bad smell inside fridge", hi: "फ्रिज के अंदर से बदबू आना" }, val: "smell" },
+    { label: { en: "Temperature not maintaining", hi: "तापमान सही नहीं रह रहा" }, val: "temp" },
+    { label: { en: "Display panel not working", hi: "डिस्प्ले पैनल काम नहीं कर रहा" }, val: "display" }
   ],
   ac: [
     { label: { en: "Not blowing cold air", hi: "ठंडी हवा नहीं आ रही है" }, val: "cooling" },
     { label: { en: "Water dripping from indoor unit", hi: "इनडोर यूनिट से पानी टपकना" }, val: "dripping" },
     { label: { en: "Strange rattling or squeaking noise", hi: "अजीब खड़खड़ाहट या चीखने की आवाज" }, val: "noise" },
-    { label: { en: "Error code flashing on screen", hi: "स्क्रीन पर एरर कोड का चमकना" }, val: "error" }
+    { label: { en: "Error code flashing on screen", hi: "स्क्रीन पर एरर कोड का चमकना" }, val: "error" },
+    { label: { en: "AC not turning on", hi: "एसी चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Remote / Panel not responding", hi: "रिमोट / पैनल काम नहीं कर रहा" }, val: "remote" },
+    { label: { en: "Bad / Foul smell from AC", hi: "एसी से बदबू आना" }, val: "smell" },
+    { label: { en: "Compressor not starting", hi: "कंप्रेसर चालू नहीं हो रहा" }, val: "compressor" },
+    { label: { en: "AC trips / Cuts off frequently", hi: "एसी बार-बार ट्रिप / बंद हो जाना" }, val: "trip" },
+    { label: { en: "Fan speed not changing", hi: "पंखे की स्पीड नहीं बदल रही" }, val: "fan" },
+    { label: { en: "Gas / Refrigerant leakage", hi: "गैस / रेफ्रिजरेंट लीक होना" }, val: "gas" }
   ],
   washing_machine: [
     { label: { en: "Water not draining out", hi: "पानी बाहर नहीं निकल रहा है" }, val: "drain" },
     { label: { en: "Drum not spinning / Agitating", hi: "ड्रम नहीं घूम रहा" }, val: "spin" },
     { label: { en: "Severe vibration or walking", hi: "तेज कंपन या हिलना" }, val: "vibrate" },
-    { label: { en: "Water leaking from bottom", hi: "नीचे से पानी बहना" }, val: "leak" }
+    { label: { en: "Water leaking from bottom", hi: "नीचे से पानी बहना" }, val: "leak" },
+    { label: { en: "Machine not turning on", hi: "मशीन चालू नहीं हो रही" }, val: "no_power" },
+    { label: { en: "Water not filling in drum", hi: "ड्रम में पानी नहीं भर रहा" }, val: "fill" },
+    { label: { en: "Error code on display", hi: "डिस्प्ले पर एरर कोड" }, val: "error" },
+    { label: { en: "Clothes not cleaned properly", hi: "कपड़े ठीक से साफ नहीं हो रहे" }, val: "wash" },
+    { label: { en: "Door not opening / Locking issue", hi: "दरवाजा नहीं खुल रहा / लॉक की समस्या" }, val: "door" },
+    { label: { en: "Burning smell during operation", hi: "चलते समय जलने की गंध" }, val: "smell" },
+    { label: { en: "Loud grinding / Banging noise", hi: "तेज पीसने / ठोकने की आवाज" }, val: "noise" }
   ],
   printer: [
     { label: { en: "Paper jam in rollers", hi: "रोलर्स में कागज का फंसना" }, val: "paper" },
     { label: { en: "Faded print / Missing lines", hi: "धुंधली छपाई / गायब लाइनें" }, val: "print" },
     { label: { en: "Double feeding papers", hi: "एक साथ कई कागज खींचना" }, val: "feed" },
-    { label: { en: "Ink cartridge not recognized", hi: "इंक कार्ट्रिज की पहचान न होना" }, val: "cartridge" }
+    { label: { en: "Ink cartridge not recognized", hi: "इंक कार्ट्रिज की पहचान न होना" }, val: "cartridge" },
+    { label: { en: "Printer not detected by PC", hi: "प्रिंटर PC से कनेक्ट नहीं हो रहा" }, val: "connect" },
+    { label: { en: "Printer not turning on", hi: "प्रिंटर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Ink smearing / Smudging on paper", hi: "कागज पर स्याही फैलना / धब्बे" }, val: "smear" },
+    { label: { en: "Wireless / Wi-Fi printing not working", hi: "वायरलेस / वाई-फाई प्रिंटिंग काम नहीं कर रही" }, val: "wireless" },
+    { label: { en: "Scanner not working", hi: "स्कैनर काम नहीं कर रहा" }, val: "scanner" },
+    { label: { en: "Printing very slow", hi: "प्रिंटिंग बहुत धीमी" }, val: "slow" }
   ],
   router: [
     { label: { en: "Wi-Fi network not visible", hi: "वाई-फाई नेटवर्क दिखाई नहीं दे रहा" }, val: "wifi" },
     { label: { en: "No internet (WAN red LED)", hi: "इंटरनेट कनेक्शन नहीं (WAN लाल बत्ती)" }, val: "internet" },
-    { label: { en: "Frequent disconnections", hi: "बार-बार डिस्कनेक्ट होना" }, val: "drops" }
+    { label: { en: "Frequent disconnections", hi: "बार-बार डिस्कनेक्ट होना" }, val: "drops" },
+    { label: { en: "Very slow internet speed", hi: "बहुत धीमी इंटरनेट स्पीड" }, val: "slow" },
+    { label: { en: "Router not turning on", hi: "राउटर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Cannot login to router settings", hi: "राउटर सेटिंग में लॉगिन नहीं हो रहा" }, val: "login" },
+    { label: { en: "Overheating router", hi: "राउटर बहुत गर्म हो रहा" }, val: "overheat" },
+    { label: { en: "LAN / Ethernet port not working", hi: "LAN / ईथरनेट पोर्ट काम नहीं कर रहा" }, val: "lan" },
+    { label: { en: "Wi-Fi range very limited", hi: "वाई-फाई की रेंज बहुत कम" }, val: "range" },
+    { label: { en: "Connected but no internet access", hi: "कनेक्टेड है पर इंटरनेट नहीं चल रहा" }, val: "no_access" }
+  ],
+  desktop: [
+    { label: { en: "PC not turning on / No power", hi: "पीसी चालू नहीं हो रहा / पावर नहीं" }, val: "no_power" },
+    { label: { en: "No display / Black screen", hi: "डिस्प्ले नहीं / काली स्क्रीन" }, val: "display" },
+    { label: { en: "Beep sounds at startup", hi: "चालू होने पर बीप की आवाजें" }, val: "beep" },
+    { label: { en: "System crash / Blue Screen (BSOD)", hi: "सिस्टम क्रैश / ब्लू स्क्रीन (BSOD)" }, val: "crash" },
+    { label: { en: "Overheating / CPU fan very loud", hi: "ओवरहीटिंग / CPU पंखा बहुत तेज" }, val: "overheat" },
+    { label: { en: "Slow performance / Freezing", hi: "धीमा प्रदर्शन / फ्रीज होना" }, val: "slow" },
+    { label: { en: "USB / Peripheral ports not working", hi: "USB / पेरिफेरल पोर्ट काम नहीं कर रहे" }, val: "usb" },
+    { label: { en: "Hard disk not detected / Clicking noise", hi: "हार्ड डिस्क नहीं मिल रही / क्लिक की आवाज" }, val: "hdd" },
+    { label: { en: "RAM not detected / Memory error", hi: "RAM नहीं मिल रही / मेमोरी एरर" }, val: "ram" },
+    { label: { en: "GPU / Graphics card not working", hi: "GPU / ग्राफिक्स कार्ड काम नहीं कर रहा" }, val: "gpu" },
+    { label: { en: "Wi-Fi / Network card not working", hi: "वाई-फाई / नेटवर्क कार्ड काम नहीं कर रहा" }, val: "wifi" }
+  ],
+  microwave: [
+    { label: { en: "Microwave not turning on", hi: "माइक्रोवेव चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Not heating food properly", hi: "खाना ठीक से गर्म नहीं हो रहा" }, val: "no_heat" },
+    { label: { en: "Sparking / Arcing inside", hi: "अंदर चिंगारी / आर्किंग होना" }, val: "spark" },
+    { label: { en: "Turntable not rotating", hi: "टर्नटेबल नहीं घूम रहा" }, val: "turntable" },
+    { label: { en: "Display not working", hi: "डिस्प्ले काम नहीं कर रहा" }, val: "display" },
+    { label: { en: "Buttons / Keypad not responding", hi: "बटन / कीपैड काम नहीं कर रहे" }, val: "keypad" },
+    { label: { en: "Burning smell during operation", hi: "चलते समय जलने की गंध" }, val: "smell" },
+    { label: { en: "Door not closing properly", hi: "दरवाजा ठीक से बंद नहीं हो रहा" }, val: "door" },
+    { label: { en: "Loud humming / Unusual noise", hi: "तेज गुनगुनाहट / असामान्य आवाज" }, val: "noise" },
+    { label: { en: "Trips / Blows fuse frequently", hi: "बार-बार ट्रिप / फ्यूज उड़ जाना" }, val: "trip" }
+  ],
+  geyser: [
+    { label: { en: "Water not heating at all", hi: "पानी बिल्कुल गर्म नहीं हो रहा" }, val: "no_heat" },
+    { label: { en: "Geyser not turning on", hi: "गीजर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Water leaking from body / pipe", hi: "बॉडी / पाइप से पानी लीक होना" }, val: "leak" },
+    { label: { en: "Thermostat not working / Overheating", hi: "थर्मोस्टेट काम नहीं कर रहा / ज्यादा गर्म होना" }, val: "thermostat" },
+    { label: { en: "Trips / MCB trips frequently", hi: "बार-बार ट्रिप / MCB उड़ जाना" }, val: "trip" },
+    { label: { en: "Heating element burnt out", hi: "हीटिंग एलिमेंट जल गया" }, val: "element" },
+    { label: { en: "Rust / Sediment in hot water", hi: "गर्म पानी में जंग / तलछट आना" }, val: "rust" },
+    { label: { en: "Pressure relief valve leaking", hi: "प्रेशर रिलीफ वाल्व से लीकेज" }, val: "valve" },
+    { label: { en: "Indicator light not working", hi: "इंडिकेटर लाइट काम नहीं कर रही" }, val: "indicator" },
+    { label: { en: "Burning smell / Electrical issue", hi: "जलने की गंध / बिजली की समस्या" }, val: "smell" }
+  ],
+  speaker: [
+    { label: { en: "No sound output", hi: "कोई आवाज नहीं आ रही" }, val: "no_sound" },
+    { label: { en: "Distorted / Crackling audio", hi: "आवाज में गड़बड़ी / चटकने की आवाज" }, val: "distort" },
+    { label: { en: "Bluetooth not connecting", hi: "ब्लूटूथ कनेक्ट नहीं हो रहा" }, val: "bluetooth" },
+    { label: { en: "Speaker not turning on", hi: "स्पीकर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Battery not charging / Draining fast", hi: "बैटरी चार्ज नहीं हो रही / जल्दी खत्म होना" }, val: "battery" },
+    { label: { en: "One channel / side not working", hi: "एक चैनल / साइड काम नहीं कर रही" }, val: "channel" },
+    { label: { en: "AUX / USB input not working", hi: "AUX / USB इनपुट काम नहीं कर रहा" }, val: "aux" },
+    { label: { en: "Volume buttons not responding", hi: "वॉल्यूम बटन काम नहीं कर रहे" }, val: "buttons" },
+    { label: { en: "Subwoofer not producing bass", hi: "सबवूफर से बेस नहीं आ रहा" }, val: "bass" },
+    { label: { en: "Pairing with device fails", hi: "डिवाइस से पेयरिंग नहीं हो रही" }, val: "pairing" }
+  ],
+  smartwatch: [
+    { label: { en: "Screen not turning on / Black", hi: "स्क्रीन चालू नहीं हो रही / काली" }, val: "no_display" },
+    { label: { en: "Battery draining very fast", hi: "बैटरी बहुत जल्दी खत्म हो रही" }, val: "battery" },
+    { label: { en: "Not syncing with phone", hi: "फोन से सिंक नहीं हो रहा" }, val: "sync" },
+    { label: { en: "Touchscreen not responding", hi: "टचस्क्रीन काम नहीं कर रही" }, val: "touch" },
+    { label: { en: "Heart rate / Sensor not working", hi: "हार्ट रेट / सेंसर काम नहीं कर रहा" }, val: "sensor" },
+    { label: { en: "GPS not tracking accurately", hi: "GPS सही ट्रैकिंग नहीं कर रहा" }, val: "gps" },
+    { label: { en: "Not charging / Charging port issue", hi: "चार्ज नहीं हो रहा / चार्जिंग पोर्ट समस्या" }, val: "charging" },
+    { label: { en: "Buttons / Crown not working", hi: "बटन / क्राउन काम नहीं कर रहा" }, val: "buttons" },
+    { label: { en: "Water damage / Condensation inside", hi: "पानी से नुकसान / अंदर नमी" }, val: "water" },
+    { label: { en: "Notifications not showing", hi: "नोटिफिकेशन नहीं आ रहे" }, val: "notify" }
+  ],
+  cctv: [
+    { label: { en: "Camera showing no image / Black screen", hi: "कैमरा में कोई इमेज नहीं / काली स्क्रीन" }, val: "no_image" },
+    { label: { en: "Blurry / Unclear footage", hi: "धुंधली / अस्पष्ट फुटेज" }, val: "blur" },
+    { label: { en: "Night vision not working", hi: "नाइट विजन काम नहीं कर रहा" }, val: "night" },
+    { label: { en: "Camera not connecting to NVR/DVR", hi: "कैमरा NVR/DVR से कनेक्ट नहीं हो रहा" }, val: "connect" },
+    { label: { en: "IP camera not accessible on network", hi: "IP कैमरा नेटवर्क पर एक्सेस नहीं हो रहा" }, val: "network" },
+    { label: { en: "Camera not turning on / No power", hi: "कैमरा चालू नहीं हो रहा / पावर नहीं" }, val: "no_power" },
+    { label: { en: "Motion detection not triggering", hi: "मोशन डिटेक्शन काम नहीं कर रहा" }, val: "motion" },
+    { label: { en: "Recording not saving to storage", hi: "रिकॉर्डिंग स्टोरेज में सेव नहीं हो रही" }, val: "storage" },
+    { label: { en: "PTZ / Pan-Tilt not moving", hi: "PTZ / पैन-टिल्ट नहीं हिल रहा" }, val: "ptz" },
+    { label: { en: "Flickering / Interference in video", hi: "वीडियो में टिमटिमाना / इंटरफेरेंस" }, val: "flicker" }
+  ],
+  fan: [
+    { label: { en: "Fan not turning on", hi: "पंखा चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Fan running very slow", hi: "पंखा बहुत धीमा चल रहा है" }, val: "slow" },
+    { label: { en: "Fan making loud noise / Rattling", hi: "पंखे से तेज आवाज / खड़खड़ाहट" }, val: "noise" },
+    { label: { en: "Fan not rotating / Blade stuck", hi: "पंखा नहीं घूम रहा / ब्लेड फंसा हुआ" }, val: "stuck" },
+    { label: { en: "Capacitor issue / Humming sound", hi: "कैपेसिटर खराब / गुनगुनाहट की आवाज" }, val: "capacitor" },
+    { label: { en: "Speed regulator not working", hi: "स्पीड रेगुलेटर काम नहीं कर रहा" }, val: "regulator" },
+    { label: { en: "Remote control not responding", hi: "रिमोट कंट्रोल काम नहीं कर रहा" }, val: "remote" },
+    { label: { en: "Fan wobbling / Shaking", hi: "पंखा हिल रहा / डगमगा रहा है" }, val: "wobble" },
+    { label: { en: "Burning smell from motor", hi: "मोटर से जलने की गंध" }, val: "smell" },
+    { label: { en: "Tripping MCB / Short circuit", hi: "MCB ट्रिप हो रहा / शॉर्ट सर्किट" }, val: "trip" }
+  ],
+  stabilizer: [
+    { label: { en: "Stabilizer not turning on", hi: "स्टेबलाइजर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Output voltage too high / too low", hi: "आउटपुट वोल्टेज बहुत ज्यादा / बहुत कम" }, val: "voltage" },
+    { label: { en: "Tripping frequently", hi: "बार-बार ट्रिप हो रहा है" }, val: "trip" },
+    { label: { en: "Burning smell / Overheating", hi: "जलने की गंध / ज्यादा गर्म होना" }, val: "overheat" },
+    { label: { en: "Display not showing voltage", hi: "डिस्प्ले पर वोल्टेज नहीं दिख रहा" }, val: "display" },
+    { label: { en: "Buzzing / Humming noise", hi: "भनभनाहट / गुनगुनाहट की आवाज" }, val: "noise" },
+    { label: { en: "Connected device not getting power", hi: "कनेक्टेड डिवाइस को पावर नहीं मिल रही" }, val: "no_output" },
+    { label: { en: "Relay clicking repeatedly", hi: "रिले बार-बार क्लिक कर रहा है" }, val: "relay" },
+    { label: { en: "Fuse blown", hi: "फ्यूज उड़ गया" }, val: "fuse" },
+    { label: { en: "Indicator light not working", hi: "इंडिकेटर लाइट काम नहीं कर रही" }, val: "indicator" }
+  ],
+  battery: [
+    { label: { en: "Battery not charging", hi: "बैटरी चार्ज नहीं हो रही" }, val: "no_charge" },
+    { label: { en: "Battery draining very fast", hi: "बैटरी बहुत जल्दी खत्म हो रही" }, val: "drain" },
+    { label: { en: "Battery swollen / Bulging", hi: "बैटरी फूल गई / उभर आई" }, val: "swell" },
+    { label: { en: "Low backup / Not holding charge", hi: "कम बैकअप / चार्ज नहीं रुक रहा" }, val: "backup" },
+    { label: { en: "Battery leaking acid", hi: "बैटरी से एसिड लीक हो रहा" }, val: "leak" },
+    { label: { en: "Terminals corroded / Rusted", hi: "टर्मिनल जंग लगे / खराब हो गए" }, val: "corrosion" },
+    { label: { en: "Battery not detected by device", hi: "डिवाइस बैटरी नहीं पहचान रहा" }, val: "not_detected" },
+    { label: { en: "Overheating while charging", hi: "चार्जिंग के दौरान ज्यादा गर्म होना" }, val: "overheat" },
+    { label: { en: "Voltage drop under load", hi: "लोड में वोल्टेज गिर जाना" }, val: "voltage_drop" },
+    { label: { en: "Dead cell / Won't start vehicle", hi: "डेड सेल / वाहन स्टार्ट नहीं हो रहा" }, val: "dead" }
+  ],
+  inverter: [
+    { label: { en: "Inverter not turning on", hi: "इन्वर्टर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "No output / Appliances not running", hi: "आउटपुट नहीं / उपकरण नहीं चल रहे" }, val: "no_output" },
+    { label: { en: "Battery not charging from inverter", hi: "इन्वर्टर से बैटरी चार्ज नहीं हो रही" }, val: "no_charge" },
+    { label: { en: "Inverter tripping / Overload alarm", hi: "इन्वर्टर ट्रिप / ओवरलोड अलार्म" }, val: "trip" },
+    { label: { en: "Beeping continuously", hi: "लगातार बीप की आवाज" }, val: "beep" },
+    { label: { en: "Burning smell / Overheating", hi: "जलने की गंध / ज्यादा गर्म होना" }, val: "overheat" },
+    { label: { en: "Display showing error code", hi: "डिस्प्ले पर एरर कोड दिख रहा" }, val: "error" },
+    { label: { en: "Low backup time", hi: "बैकअप टाइम बहुत कम" }, val: "low_backup" },
+    { label: { en: "Fan inside inverter not working", hi: "इन्वर्टर के अंदर का पंखा काम नहीं कर रहा" }, val: "fan" },
+    { label: { en: "Solar panel not charging battery", hi: "सोलर पैनल बैटरी चार्ज नहीं कर रहा" }, val: "solar" }
+  ],
+  iron: [
+    { label: { en: "Iron not heating up", hi: "आयरन गर्म नहीं हो रहा" }, val: "no_heat" },
+    { label: { en: "Iron not turning on", hi: "आयरन चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Steam not coming out", hi: "स्टीम नहीं आ रही" }, val: "no_steam" },
+    { label: { en: "Water leaking from iron", hi: "आयरन से पानी लीक हो रहा" }, val: "leak" },
+    { label: { en: "Soleplate sticking to clothes", hi: "सोलप्लेट कपड़ों से चिपक रही है" }, val: "stick" },
+    { label: { en: "Burning smell / Scorching clothes", hi: "जलने की गंध / कपड़े जल रहे हैं" }, val: "burn" },
+    { label: { en: "Thermostat not regulating temperature", hi: "थर्मोस्टेट तापमान नहीं नियंत्रित कर रहा" }, val: "thermostat" },
+    { label: { en: "Indicator light not working", hi: "इंडिकेटर लाइट काम नहीं कर रही" }, val: "indicator" },
+    { label: { en: "Tripping MCB / Electric shock", hi: "MCB ट्रिप / करंट लगना" }, val: "trip" },
+    { label: { en: "Soleplate scratched / Damaged", hi: "सोलप्लेट खरोंच गई / खराब" }, val: "soleplate" }
+  ],
+  mixer: [
+    { label: { en: "Mixer not turning on", hi: "मिक्सर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Motor making loud noise", hi: "मोटर से तेज आवाज" }, val: "noise" },
+    { label: { en: "Blades not rotating", hi: "ब्लेड नहीं घूम रहे" }, val: "blades" },
+    { label: { en: "Jar leaking from bottom", hi: "जार नीचे से लीक हो रहा" }, val: "leak" },
+    { label: { en: "Burning smell from motor", hi: "मोटर से जलने की गंध" }, val: "burn" },
+    { label: { en: "Speed not changing", hi: "स्पीड नहीं बदल रही" }, val: "speed" },
+    { label: { en: "Jar not locking properly", hi: "जार सही से लॉक नहीं हो रहा" }, val: "lock" },
+    { label: { en: "Tripping MCB / Short circuit", hi: "MCB ट्रिप / शॉर्ट सर्किट" }, val: "trip" },
+    { label: { en: "Overheating / Stops automatically", hi: "ज्यादा गर्म / अपने आप बंद हो जाना" }, val: "overheat" },
+    { label: { en: "Vibrating excessively", hi: "बहुत ज्यादा कंपन" }, val: "vibrate" }
+  ],
+  hairdryer: [
+    { label: { en: "Hair dryer not turning on", hi: "हेयर ड्रायर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Not blowing hot air", hi: "गर्म हवा नहीं आ रही" }, val: "no_heat" },
+    { label: { en: "Fan not spinning / No airflow", hi: "पंखा नहीं घूम रहा / हवा नहीं" }, val: "no_fan" },
+    { label: { en: "Overheating / Auto shutoff", hi: "ज्यादा गर्म / अपने आप बंद" }, val: "overheat" },
+    { label: { en: "Burning smell", hi: "जलने की गंध" }, val: "burn" },
+    { label: { en: "Speed / Heat settings not working", hi: "स्पीड / हीट सेटिंग काम नहीं कर रही" }, val: "settings" },
+    { label: { en: "Making loud rattling noise", hi: "तेज खड़खड़ाहट की आवाज" }, val: "noise" },
+    { label: { en: "Cord / Wire damaged", hi: "तार / वायर खराब" }, val: "cord" },
+    { label: { en: "Tripping MCB / Electric shock", hi: "MCB ट्रिप / करंट लगना" }, val: "trip" },
+    { label: { en: "Nozzle / Diffuser attachment broken", hi: "नोजल / डिफ्यूजर अटैचमेंट टूटा" }, val: "nozzle" }
+  ],
+  waterpurifier: [
+    { label: { en: "No water output / Very slow flow", hi: "पानी नहीं आ रहा / बहुत धीमा फ्लो" }, val: "no_water" },
+    { label: { en: "Water leaking from body / pipe", hi: "बॉडी / पाइप से पानी लीक" }, val: "leak" },
+    { label: { en: "Purifier not turning on", hi: "प्यूरीफायर चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "Bad taste / Smell in purified water", hi: "शुद्ध पानी में खराब स्वाद / गंध" }, val: "taste" },
+    { label: { en: "Filter change indicator on", hi: "फिल्टर बदलने का इंडिकेटर जल रहा" }, val: "filter" },
+    { label: { en: "UV lamp not working", hi: "UV लैंप काम नहीं कर रहा" }, val: "uv" },
+    { label: { en: "TDS level too high after purification", hi: "शुद्धिकरण के बाद TDS स्तर बहुत ज्यादा" }, val: "tds" },
+    { label: { en: "Tank not filling / Overflow", hi: "टैंक नहीं भर रहा / ओवरफ्लो" }, val: "tank" },
+    { label: { en: "Membrane / RO filter clogged", hi: "मेम्ब्रेन / RO फिल्टर बंद" }, val: "membrane" },
+    { label: { en: "Pump making noise / Not working", hi: "पंप से आवाज / काम नहीं कर रहा" }, val: "pump" }
+  ],
+  vacuum: [
+    { label: { en: "Vacuum not turning on", hi: "वैक्यूम चालू नहीं हो रहा" }, val: "no_power" },
+    { label: { en: "No suction / Weak suction", hi: "सक्शन नहीं / कमजोर सक्शन" }, val: "no_suction" },
+    { label: { en: "Dust bag / Filter clogged", hi: "डस्ट बैग / फिल्टर बंद" }, val: "clog" },
+    { label: { en: "Making loud noise", hi: "तेज आवाज आ रही" }, val: "noise" },
+    { label: { en: "Burning smell from motor", hi: "मोटर से जलने की गंध" }, val: "burn" },
+    { label: { en: "Brush roll not spinning", hi: "ब्रश रोल नहीं घूम रहा" }, val: "brush" },
+    { label: { en: "Hose / Pipe blocked or cracked", hi: "होज / पाइप बंद या टूटा" }, val: "hose" },
+    { label: { en: "Battery not charging (cordless)", hi: "बैटरी चार्ज नहीं (कॉर्डलेस)" }, val: "battery" },
+    { label: { en: "Overheating / Auto shutoff", hi: "ज्यादा गर्म / अपने आप बंद" }, val: "overheat" },
+    { label: { en: "Robotic vacuum not navigating", hi: "रोबोटिक वैक्यूम नेविगेट नहीं कर रहा" }, val: "navigation" }
+  ],
+  kettle: [
+    { label: { en: "Kettle not turning on", hi: "केतली चालू नहीं हो रही" }, val: "no_power" },
+    { label: { en: "Water not heating / Boiling", hi: "पानी गर्म / उबल नहीं रहा" }, val: "no_heat" },
+    { label: { en: "Auto shutoff not working", hi: "ऑटो बंद नहीं हो रहा" }, val: "shutoff" },
+    { label: { en: "Water leaking from base / lid", hi: "नीचे / ढक्कन से पानी लीक" }, val: "leak" },
+    { label: { en: "Burning smell / Taste in water", hi: "जलने की गंध / पानी में खराब स्वाद" }, val: "burn" },
+    { label: { en: "Scale / Limescale buildup inside", hi: "अंदर चूने की परत जमना" }, val: "scale" },
+    { label: { en: "Indicator light not working", hi: "इंडिकेटर लाइट काम नहीं कर रही" }, val: "indicator" },
+    { label: { en: "Lid not closing properly", hi: "ढक्कन सही से बंद नहीं हो रहा" }, val: "lid" },
+    { label: { en: "Tripping MCB / Electric shock", hi: "MCB ट्रिप / करंट लगना" }, val: "trip" },
+    { label: { en: "Heating element damaged", hi: "हीटिंग एलिमेंट खराब" }, val: "element" }
   ]
 };
 
@@ -481,6 +726,43 @@ function initDropzone() {
 
   // Start diagnosis trigger
   Elements.startDiagnosisBtn.addEventListener('click', runDiagnosticsSimulation);
+
+  // Upload Camera Capture
+  const uploadCameraBtn = document.getElementById('upload-camera-btn');
+  const uploadCameraWrap = document.getElementById('upload-camera-wrap');
+  const uploadVideo = document.getElementById('upload-video');
+  const uploadCaptureBtn = document.getElementById('upload-capture-btn');
+  const uploadStopBtn = document.getElementById('upload-stop-camera-btn');
+  const uploadCanvas = document.getElementById('upload-canvas');
+  let uploadStream = null;
+
+  function stopUploadCamera() {
+    if (uploadStream) { uploadStream.getTracks().forEach(t => t.stop()); uploadStream = null; }
+    uploadCameraWrap.style.display = 'none';
+  }
+
+  uploadCameraBtn.addEventListener('click', async () => {
+    try {
+      uploadStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      uploadVideo.srcObject = uploadStream;
+      uploadCameraWrap.style.display = 'block';
+      lucide.createIcons();
+    } catch {
+      Swal.fire({ icon: 'error', title: AppState.currentLang === 'HI' ? 'कैमरा नहीं खुला' : 'Camera Error', text: AppState.currentLang === 'HI' ? 'कैमरा एक्सेस नहीं मिली।' : 'Camera access denied or not available.', confirmButtonText: 'OK' });
+    }
+  });
+
+  uploadStopBtn.addEventListener('click', stopUploadCamera);
+
+  uploadCaptureBtn.addEventListener('click', () => {
+    uploadCanvas.width = uploadVideo.videoWidth;
+    uploadCanvas.height = uploadVideo.videoHeight;
+    uploadCanvas.getContext('2d').drawImage(uploadVideo, 0, 0);
+    const dataUrl = uploadCanvas.toDataURL('image/jpeg');
+    AppState.uploadedImages.push(dataUrl);
+    renderUploadPreviews();
+    stopUploadCamera();
+  });
 }
 
 function handleUploadedFiles(files) {
@@ -1227,6 +1509,44 @@ function loadHistoryList() {
   AppState.history.forEach(record => {
     const card = document.createElement('div');
     card.className = 'history-item-card';
+
+    // --- Image Scan Record ---
+    if (record.isImageScan) {
+      const viewBtnText = AppState.currentLang === 'HI' ? 'विवरण देखें' : 'View Details';
+      const deleteBtnText = AppState.currentLang === 'HI' ? 'हटाएं' : 'Delete';
+      card.innerHTML = `
+        <div class="history-item-header">
+          <div class="history-item-meta">
+            <span class="history-item-title" style="display:flex;align-items:center;gap:6px;"><i data-lucide="scan-eye" style="width:13px;height:13px;"></i> ${record.primaryIssue}</span>
+            <span class="history-item-date">${record.date}</span>
+          </div>
+        </div>
+        <div class="history-item-actions" style="margin-top:8px;">
+          <span class="history-item-badge moderate" style="font-size:10px;">Image Scan</span>
+          <div style="display:flex;gap:6px;">
+            <button class="history-view-btn" data-id="${record.id}">
+              <i data-lucide="eye" style="width:12px;height:12px;"></i>
+              <span>${viewBtnText}</span>
+            </button>
+            <button class="history-delete-btn" data-id="${record.id}" title="${deleteBtnText}">
+              <i data-lucide="trash-2" style="width:12px;height:12px;"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      card.querySelector('.history-view-btn').addEventListener('click', () => {
+        const formatted = record.scanReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        Swal.fire({
+          title: AppState.currentLang === 'HI' ? 'इमेज स्कैन रिपोर्ट' : 'Image Scan Report',
+          html: `<div style="text-align:left;font-size:13px;line-height:1.8;">${formatted}</div>`,
+          confirmButtonText: AppState.currentLang === 'HI' ? 'ठीक है' : 'OK',
+          width: '480px'
+        });
+      });
+      card.querySelector('.history-delete-btn').addEventListener('click', () => deleteHistoryRecord(record.id));
+      container.appendChild(card);
+      return;
+    }
     
     const viewBtnText = AppState.currentLang === 'HI' ? 'विवरण देखें' : 'View Details';
     const deleteBtnText = AppState.currentLang === 'HI' ? 'हटाएं' : 'Delete';
@@ -1581,16 +1901,55 @@ function initImageScanModal() {
   const runBtn = document.getElementById('img-scan-run-btn');
   const clearBtn = document.getElementById('img-scan-clear-btn');
   const resultBox = document.getElementById('img-scan-result');
+  const cameraBtn = document.getElementById('img-scan-camera-btn');
+  const cameraWrap = document.getElementById('img-scan-camera-wrap');
+  const video = document.getElementById('img-scan-video');
+  const captureBtn = document.getElementById('img-scan-capture-btn');
+  const stopCameraBtn = document.getElementById('img-scan-stop-camera-btn');
+  const canvas = document.getElementById('img-scan-canvas');
 
   let base64Image = null;
+  let cameraStream = null;
+
+  function stopCamera() {
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+    cameraWrap.style.display = 'none';
+  }
+
+  cameraBtn.addEventListener('click', async () => {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      video.srcObject = cameraStream;
+      cameraWrap.style.display = 'block';
+      lucide.createIcons();
+    } catch {
+      Swal.fire({ icon: 'error', title: AppState.currentLang === 'HI' ? 'कैमरा नहीं खुला' : 'Camera Error', text: AppState.currentLang === 'HI' ? 'कैमरा एक्सेस नहीं मिली।' : 'Camera access denied or not available.', confirmButtonText: 'OK' });
+    }
+  });
+
+  stopCameraBtn.addEventListener('click', stopCamera);
+
+  captureBtn.addEventListener('click', () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    base64Image = canvas.toDataURL('image/jpeg');
+    preview.src = base64Image;
+    previewWrap.style.display = 'block';
+    runBtn.disabled = false;
+    clearBtn.style.display = 'inline-flex';
+    resultBox.style.display = 'none';
+    resultBox.innerHTML = '';
+    stopCamera();
+  });
 
   openBtn.addEventListener('click', () => {
     modal.classList.add('active');
     lucide.createIcons();
   });
 
-  closeBtn.addEventListener('click', () => modal.classList.remove('active'));
-  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); });
+  closeBtn.addEventListener('click', () => { stopCamera(); modal.classList.remove('active'); });
+  modal.addEventListener('click', e => { if (e.target === modal) { stopCamera(); modal.classList.remove('active'); } });
 
   // Drag & drop
   ['dragenter', 'dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('dragover'); }));
@@ -1622,6 +1981,7 @@ function initImageScanModal() {
     clearBtn.style.display = 'none';
     resultBox.style.display = 'none';
     resultBox.innerHTML = '';
+    stopCamera();
   });
 
   runBtn.addEventListener('click', async () => {
@@ -1672,6 +2032,16 @@ function initImageScanModal() {
       resultBox.innerHTML = `<div class="img-scan-result-box">${formatted}</div>`;
       resultBox.style.display = 'block';
 
+      // Save to history
+      saveRecordToHistory({
+        id: Date.now(),
+        isImageScan: true,
+        date: new Date().toLocaleDateString(AppState.currentLang === 'HI' ? 'hi-IN' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        primaryIssue: AppState.currentLang === 'HI' ? 'इमेज स्कैन विश्लेषण' : 'Image Scan Analysis',
+        severity: 'moderate',
+        scanReply: reply
+      });
+
     } catch (err) {
       resultBox.innerHTML = `<div class="img-scan-result-box error">${AppState.currentLang === 'HI' ? 'स्कैन विफल: ' : 'Scan failed: '}${err.message}</div>`;
       resultBox.style.display = 'block';
@@ -1682,3 +2052,4 @@ function initImageScanModal() {
     lucide.createIcons();
   });
 }
+
