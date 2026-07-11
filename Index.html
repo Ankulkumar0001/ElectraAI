@@ -659,6 +659,48 @@
     </div>
   </div>
 
+  <!-- Quick Image Scan Modal -->
+  <div id="image-scan-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="scan-eye"></i>
+          <h3 data-en="Quick Image Scan" data-hi="त्वरित इमेज स्कैन">Quick Image Scan</h3>
+        </div>
+        <button id="close-image-scan-modal" class="drawer-close-btn"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc" data-en="Upload a photo of your device — AI will detect the fault directly from the image." data-hi="अपने डिवाइस की फोटो अपलोड करें — AI सीधे इमेज से खराबी पहचानेगा।">Upload a photo of your device — AI will detect the fault directly from the image.</p>
+        <div class="dropzone" id="img-scan-dropzone" style="min-height:120px; margin-top:12px;">
+          <input type="file" id="img-scan-file-input" accept="image/*" class="dropzone-file-input">
+          <div class="dropzone-content" id="img-scan-dropzone-content">
+            <div class="dropzone-icon"><i data-lucide="image-plus"></i></div>
+            <h3 style="font-size:14px;" data-en="Click or Drop Image Here" data-hi="यहां इमेज डालें">Click or Drop Image Here</h3>
+          </div>
+        </div>
+        <div id="img-scan-preview-wrap" style="display:none; margin-top:10px; text-align:center;">
+          <img id="img-scan-preview" style="max-width:100%; max-height:180px; border-radius:8px; border:1px solid var(--border-color);">
+        </div>
+        <div id="img-scan-result" style="display:none; margin-top:14px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="img-scan-clear-btn" class="btn btn-secondary" style="display:none;">
+          <i data-lucide="trash-2"></i>
+          <span data-en="Clear" data-hi="हटाएं">Clear</span>
+        </button>
+        <button id="img-scan-run-btn" class="btn btn-primary" disabled>
+          <i data-lucide="sparkles"></i>
+          <span data-en="Scan Image" data-hi="इमेज स्कैन करें">Scan Image</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Quick Scan Button -->
+  <button id="quick-image-scan-btn" class="quick-scan-fab" title="Quick Image Scan">
+    <i data-lucide="scan-eye"></i>
+  </button>
+
   <!-- Link Main JS -->
   <script src="Index.js?v=4"></script>
 </body>

@@ -208,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHistoryHandler();
   initApiKeyModal();
   initLocationHandler();
+  initImageScanModal();
   lucide.createIcons();
 });
 
@@ -1566,4 +1567,118 @@ function getDistanceKm(lat1, lng1, lat2, lng2) {
   const dLng = (lng2 - lng1) * Math.PI / 180;
   const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2) ** 2;
   return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+}
+
+// --- Quick Image Scan Modal ---
+function initImageScanModal() {
+  const modal = document.getElementById('image-scan-modal');
+  const openBtn = document.getElementById('quick-image-scan-btn');
+  const closeBtn = document.getElementById('close-image-scan-modal');
+  const fileInput = document.getElementById('img-scan-file-input');
+  const dropzone = document.getElementById('img-scan-dropzone');
+  const preview = document.getElementById('img-scan-preview');
+  const previewWrap = document.getElementById('img-scan-preview-wrap');
+  const runBtn = document.getElementById('img-scan-run-btn');
+  const clearBtn = document.getElementById('img-scan-clear-btn');
+  const resultBox = document.getElementById('img-scan-result');
+
+  let base64Image = null;
+
+  openBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+    lucide.createIcons();
+  });
+
+  closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); });
+
+  // Drag & drop
+  ['dragenter', 'dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('dragover'); }));
+  ['dragleave', 'drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('dragover'); }));
+  dropzone.addEventListener('drop', e => loadImageFile(e.dataTransfer.files[0]));
+  fileInput.addEventListener('change', () => loadImageFile(fileInput.files[0]));
+
+  function loadImageFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      base64Image = e.target.result;
+      preview.src = base64Image;
+      previewWrap.style.display = 'block';
+      runBtn.disabled = false;
+      clearBtn.style.display = 'inline-flex';
+      resultBox.style.display = 'none';
+      resultBox.innerHTML = '';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  clearBtn.addEventListener('click', () => {
+    base64Image = null;
+    fileInput.value = '';
+    preview.src = '';
+    previewWrap.style.display = 'none';
+    runBtn.disabled = true;
+    clearBtn.style.display = 'none';
+    resultBox.style.display = 'none';
+    resultBox.innerHTML = '';
+  });
+
+  runBtn.addEventListener('click', async () => {
+    if (!base64Image) return;
+    if (!AppState.geminiApiKey) {
+      Elements.apiSettingsModal.classList.add('active');
+      modal.classList.remove('active');
+      return;
+    }
+
+    runBtn.disabled = true;
+    runBtn.innerHTML = '<i data-lucide="loader-2" style="animation:spin 1s linear infinite;"></i> <span>' + (AppState.currentLang === 'HI' ? 'स्कैन हो रहा है...' : 'Scanning...') + '</span>';
+    lucide.createIcons();
+    resultBox.style.display = 'none';
+    resultBox.innerHTML = '';
+
+    try {
+      const lang = AppState.currentLang;
+      const langInstruction = lang === 'HI' ? 'Respond in Hindi only.' : 'Respond in English only.';
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AppState.geminiApiKey}` },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: `You are an electronics repair expert. Analyze this image and identify any visible faults, damage, or issues. ${langInstruction} Reply in this format:\n**Detected Issue:** ...\n**Severity:** Critical / Moderate / Minor\n**Likely Cause:** ...\n**Suggested Fix:** ...` },
+              { type: 'image_url', image_url: { url: base64Image } }
+            ]
+          }],
+          max_tokens: 400
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error?.message || 'API error');
+
+      const reply = data.choices?.[0]?.message?.content?.trim();
+      if (!reply) throw new Error('empty_response');
+
+      // Format reply
+      const formatted = reply
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+
+      resultBox.innerHTML = `<div class="img-scan-result-box">${formatted}</div>`;
+      resultBox.style.display = 'block';
+
+    } catch (err) {
+      resultBox.innerHTML = `<div class="img-scan-result-box error">${AppState.currentLang === 'HI' ? 'स्कैन विफल: ' : 'Scan failed: '}${err.message}</div>`;
+      resultBox.style.display = 'block';
+    }
+
+    runBtn.disabled = false;
+    runBtn.innerHTML = '<i data-lucide="sparkles"></i> <span>' + (AppState.currentLang === 'HI' ? 'दोबारा स्कैन करें' : 'Scan Again') + '</span>';
+    lucide.createIcons();
+  });
 }
