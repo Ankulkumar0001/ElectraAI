@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ElectraAI - Advanced Electronics Diagnostic System</title>
   <meta name="description" content="AI-powered diagnostic tool for electronics repair, troubleshooting suggestions, cost estimators, and technician matching.">
+  <!-- SEO Tags -->
+  <meta name="keywords" content="electronics repair, AI diagnostics, laptop repair, mobile repair, TV repair, AC repair, refrigerator repair, ElectraAI">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://electraaifree.netlify.app/">
+  <!-- Open Graph -->
+  <meta property="og:title" content="ElectraAI - Advanced Electronics Diagnostic System">
+  <meta property="og:description" content="AI-powered diagnostic tool for electronics repair, troubleshooting suggestions, cost estimators, and technician matching.">
+  <meta property="og:url" content="https://electraaifree.netlify.app/">
+  <meta property="og:type" content="website">
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#06b6d4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ElectraAI">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -859,5 +876,13 @@
 
   <!-- Link Main JS -->
   <script src="Index.js?v=4"></script>
+  <!-- PWA Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

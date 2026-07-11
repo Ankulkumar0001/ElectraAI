@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate ElectraAI Icons</title>
+</head>
+<body>
+  <h2>Click buttons to download icons</h2>
+  <button onclick="generate(192)">Download icon-192.png</button>
+  <button onclick="generate(512)">Download icon-512.png</button>
+  <canvas id="c" style="display:none"></canvas>
+
+  <script>
+    function generate(size) {
+      const canvas = document.getElementById('c');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Background gradient
+      const bg = ctx.createLinearGradient(0, 0, size, size);
+      bg.addColorStop(0, '#070c18');
+      bg.addColorStop(1, '#0f1f3d');
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, size * 0.18);
+      ctx.fill();
+
+      // Glow circle
+      const glow = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size*0.4);
+      glow.addColorStop(0, 'rgba(6,182,212,0.25)');
+      glow.addColorStop(1, 'rgba(6,182,212,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, size, size);
+
+      // CPU icon (simplified)
+      const s = size * 0.38;
+      const x = (size - s) / 2;
+      const y = (size - s) / 2;
+      const r = s * 0.12;
+
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = size * 0.04;
+      ctx.lineJoin = 'round';
+
+      // Outer square
+      ctx.beginPath();
+      ctx.roundRect(x, y, s, s, r);
+      ctx.stroke();
+
+      // Inner square
+      const inner = s * 0.45;
+      const ix = (size - inner) / 2;
+      const iy = (size - inner) / 2;
+      ctx.beginPath();
+      ctx.roundRect(ix, iy, inner, inner, r * 0.5);
+      ctx.stroke();
+
+      // Pins - top & bottom
+      const pinLen = s * 0.18;
+      const pinW = size * 0.025;
+      const pinCount = 3;
+      const pinSpacing = s / (pinCount + 1);
+      ctx.lineWidth = pinW;
+      ctx.lineCap = 'round';
+      for (let i = 1; i <= pinCount; i++) {
+        const px = x + pinSpacing * i;
+        // top
+        ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(px, y - pinLen); ctx.stroke();
+        // bottom
+        ctx.beginPath(); ctx.moveTo(px, y + s); ctx.lineTo(px, y + s + pinLen); ctx.stroke();
+      }
+      // Pins - left & right
+      for (let i = 1; i <= pinCount; i++) {
+        const py = y + pinSpacing * i;
+        // left
+        ctx.beginPath(); ctx.moveTo(x, py); ctx.lineTo(x - pinLen, py); ctx.stroke();
+        // right
+        ctx.beginPath(); ctx.moveTo(x + s, py); ctx.lineTo(x + s + pinLen, py); ctx.stroke();
+      }
+
+      // "AI" text
+      ctx.fillStyle = '#06b6d4';
+      ctx.font = `bold ${size * 0.13}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('AI', size / 2, size / 2);
+
+      // Download
+      const a = document.createElement('a');
+      a.download = `icon-${size}.png`;
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    }
+  </script>
+</body>
+</html>
