@@ -37,7 +37,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="Index.css?v=4">
+  <link rel="stylesheet" href="Index.css?v=31">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- SweetAlert2 -->
@@ -53,7 +53,7 @@
   <!-- Header Section -->
   <header class="app-header">
     <div class="header-container">
-      <div class="brand">
+      <a href="Index.html" class="brand" style="text-decoration:none;">
         <div class="logo-icon">
           <i data-lucide="cpu"></i>
         </div>
@@ -61,7 +61,16 @@
           <h1 class="logo-title">Electra<span class="highlight">AI</span></h1>
           <p class="logo-subtitle" data-en="Diagnostics & Repair System" data-hi="डायग्नोस्टिक्स और मरम्मत प्रणाली">Diagnostics & Repair System</p>
         </div>
-      </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="desktop-nav">
+        <a href="Index.html" class="nav-link active" data-en="Home" data-hi="होम">Home</a>
+        <a href="how-to-use.html" class="nav-link" data-en="How to Use" data-hi="कैसे उपयोग करें">How to Use</a>
+        <a href="about.html" class="nav-link" data-en="About" data-hi="हमारे बारे में">About</a>
+        <a href="terms.html" class="nav-link" data-en="Terms" data-hi="नियम व शर्तें">Terms</a>
+      </nav>
+
       <div class="header-actions">
         <!-- Language Switcher -->
         <button id="lang-toggle-btn" class="header-btn" aria-label="Toggle Language" title="Translate UI">
@@ -82,6 +91,19 @@
         <button id="api-settings-btn" class="header-btn" aria-label="API Settings" title="AI API Key Settings">
           <i data-lucide="settings"></i>
         </button>
+
+        <!-- Mobile Menu Dropdown -->
+        <div class="mobile-menu-dropdown">
+          <button id="mobile-menu-btn" class="header-btn" aria-label="Toggle Menu" title="Menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="mobile-dropdown-content" id="mobile-dropdown-content">
+            <a href="Index.html" class="dropdown-item active"><i data-lucide="home"></i><span data-en="Home" data-hi="होम">Home</span></a>
+            <a href="how-to-use.html" class="dropdown-item"><i data-lucide="help-circle"></i><span data-en="How to Use" data-hi="कैसे उपयोग करें">How to Use</span></a>
+            <a href="about.html" class="dropdown-item"><i data-lucide="info"></i><span data-en="About" data-hi="हमारे बारे में">About</span></a>
+            <a href="terms.html" class="dropdown-item"><i data-lucide="file-text"></i><span data-en="Terms" data-hi="नियम व शर्तें">Terms</span></a>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -90,6 +112,29 @@
   <main class="app-main">
     <div class="main-container">
       
+      <!-- Quick Image Scan Banner Section -->
+      <section class="quick-scan-banner-wrapper">
+        <div class="quick-scan-banner glass-panel">
+          <div class="banner-content">
+            <div class="banner-icon-container">
+              <i data-lucide="scan-eye"></i>
+              <span class="pulse-ring"></span>
+            </div>
+            <div class="banner-text">
+              <div class="banner-badge" data-en="New: AI Vision" data-hi="नया: एआई विजन">New: AI Vision</div>
+              <h2 class="banner-title" data-en="Quick Image Diagnostics" data-hi="त्वरित इमेज डायग्नोस्टिक्स">Quick Image Diagnostics</h2>
+              <p class="banner-desc" data-en="Skip forms! Upload a photo of the faulty device, damaged PCB, or error screen for instant AI analysis." data-hi="फॉर्म भरना छोड़ें! तुरंत एआई विश्लेषण के लिए खराब डिवाइस, क्षतिग्रस्त पीसीबी या एरर स्क्रीन की फोटो अपलोड करें।">Skip forms! Upload a photo of the faulty device, damaged PCB, or error screen for instant AI analysis.</p>
+            </div>
+          </div>
+          <div class="banner-action">
+            <button id="quick-image-scan-btn" class="btn btn-primary btn-glow" style="gap:8px;">
+              <i data-lucide="sparkles"></i>
+              <span data-en="Scan Now" data-hi="अभी स्कैन करें">Scan Now</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Stepper Progress Header -->
       <section class="stepper-progress-wrapper" id="stepper-header-section">
         <div class="stepper-progress">
@@ -415,10 +460,18 @@
               <span data-en="Capture from Camera" data-hi="कैमरे से फोटो लें">Capture from Camera</span>
             </button>
           </div>
-          <div id="upload-camera-wrap" style="display:none; margin-top:10px;">
-            <video id="upload-video" autoplay playsinline style="width:100%; border-radius:8px; border:1px solid var(--border-color);"></video>
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <button type="button" id="upload-capture-btn" class="btn btn-primary" style="flex:1; gap:8px;">
+          <!-- Live Camera Preview Stream Container -->
+          <div id="upload-camera-wrap" class="camera-stream-container" style="display:none; margin-top:12px;">
+            <div class="camera-lens-target">
+              <span class="lens-corner tl"></span>
+              <span class="lens-corner tr"></span>
+              <span class="lens-corner bl"></span>
+              <span class="lens-corner br"></span>
+              <div class="camera-reticle"></div>
+            </div>
+            <video id="upload-video" autoplay playsinline class="camera-video-feed"></video>
+            <div class="camera-controls-row">
+              <button type="button" id="upload-capture-btn" class="btn btn-primary btn-glowing" style="flex:1; gap:8px;">
                 <i data-lucide="aperture"></i>
                 <span data-en="Capture Photo" data-hi="फोटो खींचें">Capture Photo</span>
               </button>
@@ -534,6 +587,17 @@
           
           <!-- LEFT COLUMN: Diagnostic Findings -->
           <div class="dashboard-main-col">
+            
+            <!-- Uploaded Device Images Card -->
+            <div class="glass-panel uploaded-images-card" id="results-uploaded-images-card" style="display:none; margin-bottom: 20px;">
+              <div class="panel-subheader">
+                <i data-lucide="image" class="subheader-icon text-cyan"></i>
+                <h3 data-en="Uploaded Device Images" data-hi="अपलोड किए गए डिवाइस के चित्र">Uploaded Device Images</h3>
+              </div>
+              <div class="results-images-grid" id="results-images-grid" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
+                <!-- Images will be injected here dynamically -->
+              </div>
+            </div>
             
             <!-- Fault analysis listing card -->
             <div class="glass-panel diagnostic-card">
@@ -799,7 +863,7 @@
         <div class="modal-input-group">
           <label class="form-label">API Key</label>
           <div class="api-key-input-wrap">
-            <input type="password" id="gemini-api-key-input" class="form-input" placeholder="gsk_...">
+            <input type="password" id="groq-api-key-input" class="form-input" placeholder="gsk_...">
             <button type="button" id="toggle-key-visibility" class="voice-btn" title="Show/Hide Key">
               <i data-lucide="eye" id="eye-icon"></i>
             </button>
@@ -839,30 +903,40 @@
             <h3 style="font-size:14px;" data-en="Click or Drop Image Here" data-hi="यहां इमेज डालें">Click or Drop Image Here</h3>
           </div>
         </div>
-        <!-- Camera Capture -->
-        <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+        <!-- Camera Capture Trigger -->
+        <div style="display:flex; align-items:center; gap:10px; margin-top:12px;">
           <button type="button" id="img-scan-camera-btn" class="btn btn-secondary" style="flex:1; gap:8px;">
             <i data-lucide="camera"></i>
-            <span data-en="Open Camera" data-hi="कैमरा खोलें">Open Camera</span>
+            <span data-en="Open Live Camera" data-hi="लाइव कैमरा खोलें">Open Live Camera</span>
           </button>
         </div>
-        <!-- Camera Preview -->
-        <div id="img-scan-camera-wrap" style="display:none; margin-top:10px; position:relative;">
-          <video id="img-scan-video" autoplay playsinline style="width:100%; border-radius:8px; border:1px solid var(--border-color);"></video>
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <button type="button" id="img-scan-capture-btn" class="btn btn-primary" style="flex:1; gap:8px;">
+        <!-- Live Camera Preview Stream Container -->
+        <div id="img-scan-camera-wrap" class="camera-stream-container" style="display:none; margin-top:12px;">
+          <div class="camera-lens-target">
+            <span class="lens-corner tl"></span>
+            <span class="lens-corner tr"></span>
+            <span class="lens-corner bl"></span>
+            <span class="lens-corner br"></span>
+            <div class="camera-reticle"></div>
+          </div>
+          <video id="img-scan-video" autoplay playsinline class="camera-video-feed"></video>
+          <div class="camera-controls-row">
+            <button type="button" id="img-scan-capture-btn" class="btn btn-primary btn-glowing" style="flex:1; gap:8px;">
               <i data-lucide="aperture"></i>
-              <span data-en="Capture" data-hi="फोटो लें">Capture</span>
+              <span data-en="Capture Photo" data-hi="फोटो खींचें">Capture Photo</span>
             </button>
             <button type="button" id="img-scan-stop-camera-btn" class="btn btn-secondary" style="gap:8px;">
               <i data-lucide="x"></i>
-              <span data-en="Close" data-hi="बंद करें">Close</span>
+              <span data-en="Cancel" data-hi="रद्द करें">Cancel</span>
             </button>
           </div>
           <canvas id="img-scan-canvas" style="display:none;"></canvas>
         </div>
-        <div id="img-scan-preview-wrap" style="display:none; margin-top:10px; text-align:center;">
-          <img id="img-scan-preview" style="max-width:100%; max-height:180px; border-radius:8px; border:1px solid var(--border-color);">
+        <div id="img-scan-preview-wrap" style="display:none; margin-top:10px; text-align:center; position:relative;">
+          <div class="preview-scan-overlay" id="img-scan-overlay">
+            <div class="preview-scan-line"></div>
+          </div>
+          <img id="img-scan-preview" alt="Scan Preview" style="width:100%; max-height:340px; object-fit:contain; border-radius:8px; border:1px solid var(--border-color);">
         </div>
         <div id="img-scan-result" style="display:none; margin-top:14px;"></div>
       </div>
@@ -879,13 +953,8 @@
     </div>
   </div>
 
-  <!-- Floating Quick Scan Button -->
-  <button id="quick-image-scan-btn" class="quick-scan-fab" title="Quick Image Scan">
-    <i data-lucide="scan-eye"></i>
-  </button>
-
   <!-- Link Main JS -->
-  <script src="Index.js?v=4"></script>
+  <script src="Index.js?v=31"></script>
   <!-- PWA Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {

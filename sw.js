@@ -1,4 +1,4 @@
-const CACHE_NAME = 'electra-ai-v1';
+const CACHE_NAME = 'electra-ai-v14';
 const ASSETS = [
   './',
   './Index.html',

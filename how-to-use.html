@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Use — ElectraAI</title>
+  <meta name="description" content="Learn how to use ElectraAI step by step — from selecting your device to getting a full AI diagnostic report.">
+  <meta name="theme-color" content="#06b6d4">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="shortcut icon" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Index.css?v=30">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .info-page-main { max-width: 860px; margin: 0 auto; padding: 110px 24px 80px; }
+    .page-hero { text-align: center; margin-bottom: 56px; }
+    .page-hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25); color: var(--accent-cyan-light); padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+    .page-hero h1 { font-family: var(--font-heading); font-size: clamp(28px, 5vw, 48px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 16px; }
+    .page-hero h1 span { background: linear-gradient(135deg, var(--accent-cyan), var(--color-info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .page-hero p { font-size: 16px; color: var(--text-muted); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-cyan-light); font-size: 14px; font-weight: 600; text-decoration: none; margin-bottom: 32px; transition: gap var(--transition-fast); }
+    .back-link:hover { gap: 12px; }
+    .back-link i { width: 16px; height: 16px; }
+
+    /* Steps Timeline */
+    .steps-timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+    .steps-timeline::before { content: ''; position: absolute; left: 23px; top: 48px; bottom: 48px; width: 2px; background: linear-gradient(to bottom, var(--accent-cyan), var(--color-info), transparent); z-index: 0; }
+    .step-row { display: flex; gap: 24px; align-items: flex-start; padding: 0 0 32px 0; position: relative; z-index: 1; }
+    .step-row:last-child { padding-bottom: 0; }
+    .step-circle { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--color-info)); display: flex; align-items: center; justify-content: center; color: white; font-family: var(--font-heading); font-size: 18px; font-weight: 800; flex-shrink: 0; box-shadow: 0 0 20px rgba(6,182,212,0.4); }
+    .step-circle i { width: 22px; height: 22px; }
+    .step-content { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px 28px; backdrop-filter: blur(12px); transition: border-color var(--transition-normal); }
+    .step-content:hover { border-color: rgba(6,182,212,0.3); }
+    .step-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-cyan-light); margin-bottom: 8px; }
+    .step-content h3 { font-family: var(--font-heading); font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+    .step-content p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+    .step-content p:last-child { margin-bottom: 0; }
+    .step-tip { display: flex; align-items: flex-start; gap: 10px; background: rgba(6,182,212,0.06); border: 1px solid rgba(6,182,212,0.15); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 14px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .step-tip i { width: 16px; height: 16px; color: var(--accent-cyan-light); flex-shrink: 0; margin-top: 1px; }
+
+    /* Quick Scan Section */
+    .quick-scan-guide { background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(59,130,246,0.08)); border: 1px solid rgba(6,182,212,0.25); border-radius: var(--radius-lg); padding: 32px; margin: 48px 0; }
+    .quick-scan-guide-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .quick-scan-guide-icon { width: 50px; height: 50px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--accent-cyan), var(--color-info)); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 16px rgba(6,182,212,0.4); }
+    .quick-scan-guide-icon i { width: 24px; height: 24px; }
+    .quick-scan-guide-header h2 { font-family: var(--font-heading); font-size: 22px; font-weight: 700; }
+    .quick-scan-guide-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .quick-scan-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 8px; }
+    .qs-step { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-align: center; }
+    .qs-step-num { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--color-info)); color: white; font-family: var(--font-heading); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .qs-step h4 { font-family: var(--font-heading); font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .qs-step p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    /* Tips Section */
+    .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px; }
+    .tip-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; backdrop-filter: blur(12px); display: flex; gap: 14px; align-items: flex-start; }
+    .tip-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); background: var(--bg-input); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan-light); flex-shrink: 0; }
+    .tip-icon i { width: 18px; height: 18px; }
+    .tip-card h4 { font-family: var(--font-heading); font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .tip-card p { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+    .section-heading { font-family: var(--font-heading); font-size: 22px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .section-heading i { width: 20px; height: 20px; color: var(--accent-cyan-light); }
+
+    .cta-box { background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(59,130,246,0.1)); border: 1px solid rgba(6,182,212,0.25); border-radius: var(--radius-lg); padding: 36px; text-align: center; margin-top: 48px; }
+    .cta-box h2 { font-family: var(--font-heading); font-size: 26px; font-weight: 800; margin-bottom: 10px; }
+    .cta-box p { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; }
+
+    @media (max-width: 600px) {
+      .steps-timeline::before { left: 19px; }
+      .step-circle { width: 40px; height: 40px; font-size: 15px; }
+      .step-circle i { width: 18px; height: 18px; }
+      .step-content { padding: 18px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="decor-orb orb-1"></div>
+  <div class="decor-orb orb-2"></div>
+  <div class="decor-orb orb-3"></div>
+
+  <header class="app-header">
+    <div class="header-container">
+      <a href="Index.html" class="brand" style="text-decoration:none;">
+        <div class="logo-icon"><i data-lucide="cpu"></i></div>
+        <div class="brand-text">
+          <h1 class="logo-title">Electra<span class="highlight">AI</span></h1>
+          <p class="logo-subtitle">Diagnostics &amp; Repair System</p>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="desktop-nav">
+        <a href="Index.html" class="nav-link" data-en="Home" data-hi="होम">Home</a>
+        <a href="how-to-use.html" class="nav-link active" data-en="How to Use" data-hi="कैसे उपयोग करें">How to Use</a>
+        <a href="about.html" class="nav-link" data-en="About" data-hi="हमारे बारे में">About</a>
+        <a href="terms.html" class="nav-link" data-en="Terms" data-hi="नियम व शर्तें">Terms</a>
+      </nav>
+
+      <div class="header-actions">
+        <button id="lang-toggle-btn" class="header-btn" aria-label="Toggle Language" title="Translate UI">
+          <i data-lucide="languages"></i>
+          <span id="current-lang">EN</span>
+        </button>
+        <button id="theme-toggle-btn" class="header-btn" aria-label="Toggle Theme" title="Toggle Theme">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+
+        <!-- Mobile Menu Dropdown -->
+        <div class="mobile-menu-dropdown">
+          <button id="mobile-menu-btn" class="header-btn" aria-label="Toggle Menu" title="Menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="mobile-dropdown-content" id="mobile-dropdown-content">
+            <a href="Index.html" class="dropdown-item"><i data-lucide="home"></i><span data-en="Home" data-hi="होम">Home</span></a>
+            <a href="how-to-use.html" class="dropdown-item active"><i data-lucide="help-circle"></i><span data-en="How to Use" data-hi="कैसे उपयोग करें">How to Use</span></a>
+            <a href="about.html" class="dropdown-item"><i data-lucide="info"></i><span data-en="About" data-hi="हमारे बारे में">About</span></a>
+            <a href="terms.html" class="dropdown-item"><i data-lucide="file-text"></i><span data-en="Terms" data-hi="नियम व शर्तें">Terms</span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="info-page-main">
+
+    <div class="page-hero">
+      <div class="page-hero-badge"><i data-lucide="book-open"></i> <span data-en="User Guide" data-hi="उपयोगकर्ता गाइड">User Guide</span></div>
+      <h1 data-en="How to Use ElectraAI" data-hi="ElectraAI का उपयोग कैसे करें">How to Use <span>ElectraAI</span></h1>
+      <p data-en="Follow these simple steps to get a complete AI-powered diagnostic report for your electronics device in under 2 minutes." data-hi="अपने इलेक्ट्रॉनिक्स उपकरण के लिए 2 मिनट से कम समय में पूरी AI-संचालित डायग्नोस्टिक रिपोर्ट प्राप्त करने के लिए इन सरल चरणों का पालन करें।">Follow these simple steps to get a complete AI-powered diagnostic report for your electronics device in under 2 minutes.</p>
+    </div>
+
+    <!-- Main Steps -->
+    <div class="section-heading"><i data-lucide="list-ordered"></i> <span data-en="Full Diagnostic — Step by Step" data-hi="पूर्ण निदान — चरण दर चरण">Full Diagnostic — Step by Step</span></div>
+    <div class="steps-timeline">
+
+      <div class="step-row">
+        <div class="step-circle"><i data-lucide="key"></i></div>
+        <div class="step-content">
+          <div class="step-tag" data-en="Step 0 — One Time Setup" data-hi="चरण 0 — एक बार सेटअप">Step 0 — One Time Setup</div>
+          <h3 data-en="Enter Your Groq API Key" data-hi="अपनी Groq API कुंजी दर्ज करें">Enter Your Groq API Key</h3>
+          <p data-en="Click the Settings (⚙️) icon in the top-right header. Enter your free Groq API key (starts with gsk_) and click Save. Your key is stored only in your browser." data-hi="ऊपर दाईं ओर हेडर में सेटिंग्स (⚙️) आइकन पर क्लिक करें। अपनी मुफ्त Groq API कुंजी दर्ज करें (gsk_ से शुरू होने वाली) और सहेजें पर क्लिक करें। आपकी कुंजी केवल आपके ब्राउज़र में संग्रहीत की जाती है।">Click the <strong>Settings (⚙️)</strong> icon in the top-right header. Enter your free Groq API key (starts with <code style="background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:12px;">gsk_</code>) and click Save. Your key is stored only in your browser.</p>
+          <div class="step-tip"><i data-lucide="lightbulb"></i> <span data-en="Get a free API key at console.groq.com/keys — no credit card needed." data-hi="console.groq.com/keys पर एक मुफ्त API कुंजी प्राप्त करें — किसी क्रेडिट कार्ड की आवश्यकता नहीं है।">Get a free API key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent-cyan-light);margin-left:4px;">console.groq.com/keys</a> — no credit card needed.</span></div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-circle"><i data-lucide="layers"></i></div>
+        <div class="step-content">
+          <div class="step-tag" data-en="Step 1" data-hi="चरण 1">Step 1</div>
+          <h3 data-en="Select Your Device" data-hi="अपना उपकरण चुनें">Select Your Device</h3>
+          <p data-en="On the main screen, choose the category of your device — Laptop, Mobile, TV, AC, Refrigerator, Washing Machine, and 15+ more options." data-hi="मुख्य स्क्रीन पर, अपने डिवाइस की श्रेणी चुनें — लैपटॉप, मोबाइल, टीवी, एसी, रेफ्रिजरेटर, वाशिंग मशीन और 15+ से अधिक विकल्प।">On the main screen, choose the category of your device — Laptop, Mobile, TV, AC, Refrigerator, Washing Machine, and 15+ more options.</p>
+          <p data-en="Click on the device card that matches your device. It will highlight in cyan when selected." data-hi="उस डिवाइस कार्ड पर क्लिक करें जो आपके डिवाइस से मेल खाता है। चुने जाने पर यह सियान (cyan) रंग में हाइलाइट होगा।">Click on the device card that matches your device. It will highlight in cyan when selected.</p>
+          <div class="step-tip"><i data-lucide="info"></i> <span data-en="Can't find your device? Choose the closest category — the AI will still give accurate results." data-hi="अपना डिवाइस नहीं मिल रहा है? निकटतम श्रेणी चुनें — AI अभी भी सटीक परिणाम देगा।">Can't find your device? Choose the closest category — the AI will still give accurate results.</span></div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-circle"><i data-lucide="file-text"></i></div>
+        <div class="step-content">
+          <div class="step-tag" data-en="Step 2" data-hi="चरण 2">Step 2</div>
+          <h3 data-en="Fill Device Details" data-hi="डिवाइस का विवरण भरें">Fill Device Details</h3>
+          <p data-en="Enter your device's Brand (e.g. Samsung, HP, LG) and Model Number. Optionally add the purchase year and any error codes shown on screen." data-hi="अपने डिवाइस का ब्रांड (जैसे सैमसंग, एचपी, एलजी) और मॉडल नंबर दर्ज करें। वैकल्पिक रूप से खरीद का वर्ष और स्क्रीन पर दिखाई देने वाले त्रुटि कोड जोड़ें।">Enter your device's <strong>Brand</strong> (e.g. Samsung, HP, LG) and <strong>Model Number</strong>. Optionally add the purchase year and any error codes shown on screen.</p>
+          <p data-en="Select all symptoms that apply to your device from the checklist. Then describe the problem in detail in the text box — the more detail, the better the diagnosis." data-hi="चेकलिस्ट से अपने डिवाइस पर लागू होने वाले सभी लक्षणों का चयन करें। फिर टेक्स्ट बॉक्स में समस्या का विस्तार से वर्णन करें — विवरण जितना बेहतर होगा, निदान उतना ही सटीक होगा।">Select all <strong>symptoms</strong> that apply to your device from the checklist. Then describe the problem in detail in the text box — the more detail, the better the diagnosis.</p>
+          <div class="step-tip"><i data-lucide="mic"></i> <span data-en="Use the microphone button to speak your problem description instead of typing." data-hi="टाइप करने के बजाय अपनी समस्या का वर्णन बोलने के लिए माइक्रोफ़ोन बटन का उपयोग करें।">Use the microphone button to speak your problem description instead of typing.</span></div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-circle"><i data-lucide="image"></i></div>
+        <div class="step-content">
+          <div class="step-tag" data-en="Step 3 — Optional but Recommended" data-hi="चरण 3 — वैकल्पिक लेकिन अनुशंसित">Step 3 — Optional but Recommended</div>
+          <h3 data-en="Upload Device Photos" data-hi="डिवाइस की तस्वीरें अपलोड करें">Upload Device Photos</h3>
+          <p data-en="Upload photos of your device — the screen, error messages, damaged parts, or internal PCB. This helps the AI give a more accurate visual diagnosis." data-hi="अपने डिवाइस की तस्वीरें अपलोड करें — स्क्रीन, त्रुटि संदेश, क्षतिग्रस्त हिस्से या आंतरिक पीसीबी। यह AI को अधिक सटीक दृश्य निदान देने में मदद करता है।">Upload photos of your device — the screen, error messages, damaged parts, or internal PCB. This helps the AI give a more accurate visual diagnosis.</p>
+          <p data-en="You can drag & drop images, browse files, or use your camera directly from the app." data-hi="आप छवियों को ड्रैग एंड ड्रॉप कर सकते हैं, फ़ाइलें ब्राउज़ कर सकते हैं, या सीधे ऐप से अपने कैमरे का उपयोग कर सकते हैं।">You can drag & drop images, browse files, or use your camera directly from the app.</p>
+          <div class="step-tip"><i data-lucide="camera"></i> <span data-en="Take clear, well-lit photos. Blurry or dark images reduce AI accuracy." data-hi="स्पष्ट, अच्छी रोशनी वाली तस्वीरें लें। धुंधली या अंधेरी छवियों से AI की सटीकता कम हो जाती है।">Take clear, well-lit photos. Blurry or dark images reduce AI accuracy.</span></div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-circle"><i data-lucide="sparkles"></i></div>
+        <div class="step-content">
+          <div class="step-tag" data-en="Step 4" data-hi="चरण 4">Step 4</div>
+          <h3 data-en="Run AI Diagnostic" data-hi="AI निदान शुरू करें">Run AI Diagnostic</h3>
+          <p data-en="Click 'Run AI Diagnostic'. The AI will analyze all your inputs — symptoms, device info, and images — and generate a complete diagnostic report in 10–30 seconds." data-hi="Click 'Run AI Diagnostic'। AI आपके सभी इनपुट — लक्षणों, डिवाइस की जानकारी और छवियों — का विश्लेषण करेगा और 10-30 सेकंड में एक संपूर्ण नैदानिक रिपोर्ट तैयार करेगा।">Click 'Run AI Diagnostic'. The AI will analyze all your inputs — symptoms, device info, and images — and generate a complete diagnostic report in 10–30 seconds.</p>
+          <p data-en="You'll see a live scanning animation while the AI processes your data." data-hi="जब AI आपके डेटा को प्रोसेस कर रहा होगा, तो आपको एक लाइव स्कैनिंग एनीमेशन दिखाई देगा।">You'll see a live scanning animation while the AI processes your data.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-circle"><i data-lucide="bar-chart-2"></i></div>
+        <div class="step-content">
+          <div class="step-tag" data-en="Step 5" data-hi="चरण 5">Step 5</div>
+          <h3 data-en="Review Your Results" data-hi="अपने परिणामों की समीक्षा करें">Review Your Results</h3>
+          <p data-en="Your diagnostic dashboard will show:" data-hi="आपका डायग्नोस्टिक डैशबोर्ड दिखाएगा:">Your diagnostic dashboard will show:</p>
+          <ul style="padding-left:18px;margin:8px 0;display:flex;flex-direction:column;gap:6px;">
+            <li style="font-size:14px;color:var(--text-muted);">🔎 <strong data-en="Diagnostic Findings" data-hi="जांच के निष्कर्ष">Diagnostic Findings</strong> — likely faults with confidence scores</li>
+            <li style="font-size:14px;color:var(--text-muted);">💵 <strong data-en="Repair Cost Breakdown" data-hi="मरम्मत लागत विवरण">Repair Cost Breakdown</strong> — min/max estimates per component</li>
+            <li style="font-size:14px;color:var(--text-muted);">🛠️ <strong data-en="Troubleshooting Steps" data-hi="समस्या निवारण चरण">Troubleshooting Steps</strong> — DIY or technician action guides</li>
+            <li style="font-size:14px;color:var(--text-muted);">🤖 <strong data-en="AI Chat" data-hi="AI चैट">AI Chat</strong> — ask follow-up questions about your repair</li>
+            <li style="font-size:14px;color:var(--text-muted);">📍 <strong data-en="Nearby Repair Centers" data-hi="नजदीकी मरम्मत केंद्र">Nearby Repair Centers</strong> — shops near your location</li>
+          </ul>
+          <div class="step-tip"><i data-lucide="printer"></i> <span data-en="Click 'Print / PDF' to save or print your full diagnostic report." data-hi="अपनी पूरी नैदानिक रिपोर्ट को सहेजने या प्रिंट करने के लिए 'प्रिंट / पीडीएफ' पर क्लिक करें।">Click "Print / PDF" to save or print your full diagnostic report.</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Quick Image Scan Guide -->
+    <div class="quick-scan-guide">
+      <div class="quick-scan-guide-header">
+        <div class="quick-scan-guide-icon"><i data-lucide="scan-eye"></i></div>
+        <div>
+          <h2 data-en="Quick Image Scan" data-hi="त्वरित इमेज स्कैन">Quick Image Scan</h2>
+          <p data-en="Get instant fault detection from just a photo — no form filling needed" data-hi="बिना फॉर्म भरे सिर्फ एक फोटो से तुरंत खराबी का पता लगाएं">Get instant fault detection from just a photo — no form filling needed</p>
+        </div>
+      </div>
+      <div class="quick-scan-steps">
+        <div class="qs-step">
+          <div class="qs-step-num">1</div>
+          <h4 data-en="Click 'Scan Now'" data-hi="'अभी स्कैन करें' पर क्लिक करें">Click "Scan Now"</h4>
+          <p data-en="Find the Quick Image Scan banner at the top of the app and click Scan Now." data-hi="ऐप के शीर्ष पर त्वरित इमेज स्कैन बैनर ढूंढें और अभी स्कैन करें पर क्लिक करें।">Find the Quick Image Scan banner at the top of the app and click Scan Now.</p>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">2</div>
+          <h4 data-en="Upload or Capture" data-hi="अपलोड या कैप्चर करें">Upload or Capture</h4>
+          <p data-en="Drop an image, browse your files, or use your camera to take a live photo." data-hi="एक छवि डालें, अपनी फ़ाइलें ब्राउज़ करें, या लाइव फ़ोटो लेने के लिए अपने कैमरे का उपयोग करें।">Drop an image, browse your files, or use your camera to take a live photo.</p>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">3</div>
+          <h4 data-en="Click Scan Image" data-hi="इमेज स्कैन करें पर क्लिक करें">Click Scan Image</h4>
+          <p data-en="Hit the 'Scan Image' button and AI will analyze the photo in seconds." data-hi="&quot;इमेज स्कैन करें&quot; बटन दबाएं और AI सेकंडों में फोटो का विश्लेषण करेगा।">Hit the "Scan Image" button and AI will analyze the photo in seconds.</p>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">4</div>
+          <h4 data-en="Get Results" data-hi="परिणाम प्राप्त करें">Get Results</h4>
+          <p data-en="View the AI's visual fault analysis directly in the popup window." data-hi="पॉपअप विंडो में सीधे AI के दृश्य खराबी विश्लेषण को देखें।">View the AI's visual fault analysis directly in the popup window.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pro Tips -->
+    <div class="section-heading" style="margin-top:48px;"><i data-lucide="zap"></i> <span data-en="Pro Tips for Better Results" data-hi="बेहतर परिणामों के लिए प्रो टिप्स">Pro Tips for Better Results</span></div>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-icon"><i data-lucide="message-square"></i></div>
+        <div>
+          <h4 data-en="Be Descriptive" data-hi="वर्णनात्मक बनें">Be Descriptive</h4>
+          <p data-en="The more detail you provide in the problem description, the more accurate the AI diagnosis will be." data-hi="आप समस्या के विवरण में जितना अधिक विवरण प्रदान करेंगे, AI निदान उतना ही सटीक होगा।">The more detail you provide in the problem description, the more accurate the AI diagnosis will be.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon"><i data-lucide="check-square"></i></div>
+        <div>
+          <h4 data-en="Select All Symptoms" data-hi="सभी लक्षणों का चयन करें">Select All Symptoms</h4>
+          <p data-en="Check every symptom that applies — even minor ones. They help the AI narrow down the root cause." data-hi="लागू होने वाले हर लक्षण को चुनें — मामूली भी। वे AI को मूल कारण को समझने में मदद करते हैं।">Check every symptom that applies — even minor ones. They help the AI narrow down the root cause.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon"><i data-lucide="image"></i></div>
+        <div>
+          <h4 data-en="Upload Multiple Photos" data-hi="एकाधिक फोटो अपलोड करें">Upload Multiple Photos</h4>
+          <p data-en="Upload photos from different angles — front, back, screen, and internal board if accessible." data-hi="विभिन्न कोणों से फोटो अपलोड करें — आगे, पीछे, स्क्रीन और आंतरिक बोर्ड यदि सुलभ हो।">Upload photos from different angles — front, back, screen, and internal board if accessible.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon"><i data-lucide="map-pin"></i></div>
+        <div>
+          <h4 data-en="Share Location" data-hi="लोकेशन साझा करें">Share Location</h4>
+          <p data-en="Allow location access in Step 2 to get real nearby repair shops within 10km of you." data-hi="अपने 10 किमी के भीतर वास्तविक नजदीकी मरम्मत दुकानों को प्राप्त करने के लिए चरण 2 में स्थान पहुंच की अनुमति दें।">Allow location access in Step 2 to get real nearby repair shops within 10km of you.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon"><i data-lucide="history"></i></div>
+        <div>
+          <h4 data-en="Use History" data-hi="इतिहास का उपयोग करें">Use History</h4>
+          <p data-en="All past diagnoses are saved. Click the History icon to revisit or compare previous reports." data-hi="सभी पिछले निदान सहेजे गए हैं। पिछले रिपोर्टों को दोबारा देखने या तुलना करने के लिए इतिहास आइकन पर क्लिक करें।">All past diagnoses are saved. Click the History icon to revisit or compare previous reports.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon"><i data-lucide="bot"></i></div>
+        <div>
+          <h4 data-en="Chat with AI" data-hi="AI के साथ चैट करें">Chat with AI</h4>
+          <p data-en="After diagnosis, use the AI chat panel to ask specific questions about your repair or parts." data-hi="निदान के बाद, अपनी मरम्मत या पुर्जों के बारे में विशिष्ट प्रश्न पूछने के लिए AI चैट पैनल का उपयोग करें।">After diagnosis, use the AI chat panel to ask specific questions about your repair or parts.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box">
+      <h2 data-en="Ready to Diagnose?" data-hi="क्या आप निदान के लिए तैयार हैं?">Ready to Diagnose?</h2>
+      <p data-en="Start your free AI-powered electronics diagnosis now — no signup required." data-hi="अब अपना मुफ्त AI-संचालित इलेक्ट्रॉनिक्स निदान शुरू करें — किसी साइनअप की आवश्यकता नहीं है।">Start your free AI-powered electronics diagnosis now — no signup required.</p>
+      <a href="Index.html" class="btn btn-primary" style="display:inline-flex;gap:10px;text-decoration:none;">
+        <i data-lucide="sparkles"></i> <span data-en="Start Diagnosis" data-hi="निदान शुरू करें">Start Diagnosis</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 ElectraAI System. All rights reserved.</p>
+      <p data-en="Designed for Professional Electronics Fault Detection" data-hi="पेशेवर इलेक्ट्रॉनिक्स खराबी का पता लगाने के लिए डिज़ाइन किया गया">Designed for Professional Electronics Fault Detection</p>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // Theme Management
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+      });
+    }
+
+    // Language Management
+    const langToggleBtn = document.getElementById('lang-toggle-btn');
+    const langSpan = document.getElementById('current-lang');
+    let currentLang = (localStorage.getItem('lang') || 'EN').toUpperCase();
+    
+    if (langSpan) langSpan.textContent = currentLang;
+    updateLanguageTexts();
+
+    // BroadcastChannel for instant cross-tab sync
+    const langChannel = (() => { try { return new BroadcastChannel('electra_lang_sync'); } catch(e) { return null; } })();
+
+    if (langToggleBtn) {
+      langToggleBtn.addEventListener('click', () => {
+        currentLang = currentLang === 'EN' ? 'HI' : 'EN';
+        localStorage.setItem('lang', currentLang);
+        if (langSpan) langSpan.textContent = currentLang;
+        updateLanguageTexts();
+        if (langChannel) langChannel.postMessage({ type: 'lang', value: currentLang });
+      });
+    }
+
+    // BroadcastChannel listener (instant, same-origin tabs)
+    if (langChannel) {
+      langChannel.onmessage = (e) => {
+        if (e.data.type === 'lang') {
+          currentLang = e.data.value.toUpperCase();
+          if (langSpan) langSpan.textContent = currentLang;
+          updateLanguageTexts();
+        }
+        if (e.data.type === 'theme') {
+          document.documentElement.setAttribute('data-theme', e.data.value);
+        }
+      };
+    }
+
+    // Fallback: storage event
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'lang' && e.newValue) {
+        currentLang = e.newValue.toUpperCase();
+        if (langSpan) langSpan.textContent = currentLang;
+        updateLanguageTexts();
+      }
+      if (e.key === 'theme' && e.newValue) {
+        document.documentElement.setAttribute('data-theme', e.newValue);
+      }
+    });
+
+    function updateLanguageTexts() {
+      const lang = currentLang;
+      document.querySelectorAll('[data-en], [data-hi]').forEach(el => {
+        if (el.children.length > 0) return; // skip elements with icons/child elements
+        if (lang === 'HI' && el.getAttribute('data-hi')) {
+          el.textContent = el.getAttribute('data-hi');
+        } else if (lang === 'EN' && el.getAttribute('data-en')) {
+          el.textContent = el.getAttribute('data-en');
+        }
+      });
+    }
+
+    // Mobile Menu Dropdown Toggle
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const dropdownContent = document.getElementById('mobile-dropdown-content');
+    if (menuBtn && dropdownContent) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownContent.classList.toggle('active');
+      });
+      document.addEventListener('click', () => {
+        dropdownContent.classList.remove('active');
+      });
+    }
+
+    // Scroll listener for header animation
+    const header = document.querySelector('.app-header');
+    if (header) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

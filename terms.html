@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions — ElectraAI</title>
+  <meta name="description" content="Read ElectraAI's Terms and Conditions, Privacy Policy, and usage guidelines.">
+  <meta name="theme-color" content="#06b6d4">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="shortcut icon" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Index.css?v=30">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .info-page-main { max-width: 800px; margin: 0 auto; padding: 110px 24px 80px; }
+    .page-hero { text-align: center; margin-bottom: 48px; }
+    .page-hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25); color: var(--accent-cyan-light); padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+    .page-hero h1 { font-family: var(--font-heading); font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+    .page-hero h1 span { background: linear-gradient(135deg, var(--accent-cyan), var(--color-info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .page-hero p { font-size: 16px; color: var(--text-muted); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-cyan-light); font-size: 14px; font-weight: 600; text-decoration: none; margin-bottom: 32px; transition: gap var(--transition-fast); }
+    .back-link:hover { gap: 12px; }
+    .back-link i { width: 16px; height: 16px; }
+
+    .terms-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px; backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 28px; }
+    .terms-section { display: flex; gap: 18px; align-items: flex-start; }
+    .terms-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan-light); flex-shrink: 0; }
+    .terms-icon i { width: 20px; height: 20px; }
+    .terms-content { flex: 1; }
+    .terms-content h3 { font-family: var(--font-heading); font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+    .terms-content p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+    .disclaimer-alert { display: flex; gap: 14px; background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); border-radius: var(--radius-md); padding: 18px 20px; margin-top: 24px; font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+    .disclaimer-alert i { width: 20px; height: 20px; color: #ef4444; flex-shrink: 0; margin-top: 2px; }
+    .disclaimer-alert strong { color: var(--text-main); }
+  </style>
+</head>
+<body>
+  <div class="decor-orb orb-1"></div>
+  <div class="decor-orb orb-2"></div>
+  <div class="decor-orb orb-3"></div>
+
+  <header class="app-header">
+    <div class="header-container">
+      <a href="Index.html" class="brand" style="text-decoration:none;">
+        <div class="logo-icon"><i data-lucide="cpu"></i></div>
+        <div class="brand-text">
+          <h1 class="logo-title">Electra<span class="highlight">AI</span></h1>
+          <p class="logo-subtitle">Diagnostics &amp; Repair System</p>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="desktop-nav">
+        <a href="Index.html" class="nav-link" data-en="Home" data-hi="होम">Home</a>
+        <a href="how-to-use.html" class="nav-link" data-en="How to Use" data-hi="कैसे उपयोग करें">How to Use</a>
+        <a href="about.html" class="nav-link" data-en="About" data-hi="हमारे बारे में">About</a>
+        <a href="terms.html" class="nav-link active" data-en="Terms" data-hi="नियम व शर्तें">Terms</a>
+      </nav>
+
+      <div class="header-actions">
+        <button id="lang-toggle-btn" class="header-btn" aria-label="Toggle Language" title="Translate UI">
+          <i data-lucide="languages"></i>
+          <span id="current-lang">EN</span>
+        </button>
+        <button id="theme-toggle-btn" class="header-btn" aria-label="Toggle Theme" title="Toggle Theme">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+
+        <!-- Mobile Menu Dropdown -->
+        <div class="mobile-menu-dropdown">
+          <button id="mobile-menu-btn" class="header-btn" aria-label="Toggle Menu" title="Menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="mobile-dropdown-content" id="mobile-dropdown-content">
+            <a href="Index.html" class="dropdown-item"><i data-lucide="home"></i><span data-en="Home" data-hi="होम">Home</span></a>
+            <a href="how-to-use.html" class="dropdown-item"><i data-lucide="help-circle"></i><span data-en="How to Use" data-hi="कैसे उपयोग करें">How to Use</span></a>
+            <a href="about.html" class="dropdown-item"><i data-lucide="info"></i><span data-en="About" data-hi="हमारे बारे में">About</span></a>
+            <a href="terms.html" class="dropdown-item active"><i data-lucide="file-text"></i><span data-en="Terms" data-hi="नियम व शर्तें">Terms</span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="info-page-main">
+
+    <div class="page-hero">
+      <div class="page-hero-badge"><i data-lucide="file-text"></i> <span data-en="Terms of Service" data-hi="सेवा की शर्तें">Terms of Service</span></div>
+      <h1 data-en="Terms &amp; Conditions" data-hi="नियम और शर्तें">Terms &amp; Conditions</h1>
+      <p data-en="Please read our terms of service, disclaimers, and data policies carefully before using the system." data-hi="कृपया सिस्टम का उपयोग करने से पहले हमारी सेवा की शर्तों, अस्वीकरणों और डेटा नीतियों को ध्यान से पढ़ें।">Please read our terms of service, disclaimers, and data policies carefully before using the system.</p>
+    </div>
+
+    <div class="terms-card">
+      <!-- Section 1 -->
+      <div class="terms-section">
+        <div class="terms-icon"><i data-lucide="shield-check"></i></div>
+        <div class="terms-content">
+          <h3 data-en="1. Acceptance of Terms" data-hi="1. शर्तों की स्वीकृति">1. Acceptance of Terms</h3>
+          <p data-en="By accessing and using ElectraAI, you agree to comply with and be bound by these Terms and Conditions. If you do not agree, please do not use this platform." data-hi="ElectraAI का उपयोग करके, आप इन नियमों और शर्तों का पालन करने और उनसे बंधे रहने के लिए सहमत हैं। यदि आप असहमत हैं, तो कृपया इस प्लेटफ़ॉर्म का उपयोग न करें।">By accessing and using ElectraAI, you agree to comply with and be bound by these Terms and Conditions. If you do not agree, please do not use this platform.</p>
+        </div>
+      </div>
+
+      <!-- Section 2 -->
+      <div class="terms-section">
+        <div class="terms-icon"><i data-lucide="alert-triangle"></i></div>
+        <div class="terms-content">
+          <h3 data-en="2. AI Diagnostics Disclaimer" data-hi="2. AI डायग्नोस्टिक्स अस्वीकरण">2. AI Diagnostics Disclaimer</h3>
+          <p data-en="ElectraAI uses advanced artificial intelligence models (LLaMA via Groq API) to analyze symptoms and suggest potential faults. These suggestions are for informational and educational purposes only. They do not constitute professional engineering or certified repair advice." data-hi="ElectraAI लक्षणों का विश्लेषण करने और संभावित दोषों का सुझाव देने के लिए उन्नत AI मॉडल (Groq API के माध्यम से LLaMA) का उपयोग करता है। ये सुझाव केवल सूचनात्मक और शैक्षिक उद्देश्यों के लिए हैं। ये पेशेवर इंजीनियरिंग या प्रमाणित मरम्मत सलाह नहीं हैं।">ElectraAI uses advanced artificial intelligence models (LLaMA via Groq API) to analyze symptoms and suggest potential faults. These suggestions are for informational and educational purposes only. They do not constitute professional engineering or certified repair advice.</p>
+        </div>
+      </div>
+
+      <!-- Section 3 -->
+      <div class="terms-section">
+        <div class="terms-icon"><i data-lucide="hammer"></i></div>
+        <div class="terms-content">
+          <h3 data-en="3. Limitation of Liability for Repairs" data-hi="3. मरम्मत के लिए दायित्व की सीमा">3. Limitation of Liability for Repairs</h3>
+          <p data-en="Users perform any physical repair actions, testing, or troubleshooting steps at their own risk. ElectraAI is not liable for device damage, data loss, personal injuries, electrical hazards, or financial losses incurred during self-repair attempts." data-hi="उपयोगकर्ता अपने जोखिम पर कोई भी शारीरिक मरम्मत, परीक्षण या समस्या निवारण चरण करते हैं। स्वयं मरम्मत के प्रयासों के दौरान डिवाइस के नुकसान, डेटा हानि, व्यक्तिगत चोटों, विद्युत खतरों या वित्तीय नुकसान के लिए ElectraAI उत्तरदायी नहीं है।">Users perform any physical repair actions, testing, or troubleshooting steps at their own risk. ElectraAI is not liable for device damage, data loss, personal injuries, electrical hazards, or financial losses incurred during self-repair attempts.</p>
+        </div>
+      </div>
+
+      <!-- Section 4 -->
+      <div class="terms-section">
+        <div class="terms-icon"><i data-lucide="lock"></i></div>
+        <div class="terms-content">
+          <h3 data-en="4. Privacy &amp; Local Storage" data-hi="4. गोपनीयता और लोकल स्टोरेज">4. Privacy &amp; Local Storage</h3>
+          <p data-en="ElectraAI values your privacy. We do not store your diagnostic history, uploaded images, or custom API keys on any remote server. All data is saved locally in your browser's local storage and can be deleted by clearing your browser cache or history." data-hi="ElectraAI आपकी गोपनीयता का सम्मान करता है। हम किसी भी रिमोट सर्वर पर आपकी जांच का इतिहास, अपलोड की गई तस्वीरें या कस्टम API कुंजी संग्रहीत नहीं करते हैं। सभी डेटा आपके ब्राउज़र के लोकल स्टोरेज में स्थानीय रूप से सहेजे जाते हैं।">ElectraAI values your privacy. We do not store your diagnostic history, uploaded images, or custom API keys on any remote server. All data is saved locally in your browser's local storage and can be deleted by clearing your browser cache or history.</p>
+        </div>
+      </div>
+
+      <!-- Section 5 -->
+      <div class="terms-section">
+        <div class="terms-icon"><i data-lucide="key"></i></div>
+        <div class="terms-content">
+          <h3 data-en="5. Third-Party APIs" data-hi="5. तृतीय-पक्ष API">5. Third-Party APIs</h3>
+          <p data-en="To use the AI capabilities, you must provide your own API key. ElectraAI does not collect, monitor, or manage your API keys or rate limits. You are responsible for any charges or usage associated with your own API credentials." data-hi="AI क्षमताओं का उपयोग करने के लिए, आपको अपनी खुद की API कुंजी प्रदान करनी होगी। ElectraAI आपकी API कुंजियों या दर सीमाओं को एकत्रित, मॉनिटर या प्रबंधित नहीं करता है। आप अपने स्वयं के API क्रेडेंशियल से जुड़े किसी भी शुल्क या उपयोग के लिए जिम्मेदार हैं।">To use the AI capabilities, you must provide your own API key. ElectraAI does not collect, monitor, or manage your API keys or rate limits. You are responsible for any charges or usage associated with your own API credentials.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Safety Banner -->
+    <div class="disclaimer-alert">
+      <i data-lucide="alert-octagon"></i>
+      <div>
+        <strong data-en="SAFETY FIRST:" data-hi="सुरक्षा सर्वोपरि:">SAFETY FIRST:</strong>
+        <span data-en=" Always unplug electronics and discharge capacitors before attempting any physical diagnostics or repairs. If in doubt, consult a professional technician." data-hi=" कोई भी शारीरिक निदान या मरम्मत का प्रयास करने से पहले हमेशा इलेक्ट्रॉनिक्स को अनप्लग करें और कैपेसिटर को डिस्चार्ज करें। यदि संदेह हो, तो पेशेवर तकनीशियन से परामर्श लें।"> Always unplug electronics and discharge capacitors before attempting any physical diagnostics or repairs. If in doubt, consult a professional technician.</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 ElectraAI System. All rights reserved.</p>
+      <p data-en="Designed for Professional Electronics Fault Detection" data-hi="पेशेवर इलेक्ट्रॉनिक्स खराबी का पता लगाने के लिए डिज़ाइन किया गया">Designed for Professional Electronics Fault Detection</p>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // Theme Management
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+      });
+    }
+
+    // Language Management
+    const langToggleBtn = document.getElementById('lang-toggle-btn');
+    const langSpan = document.getElementById('current-lang');
+    let currentLang = (localStorage.getItem('lang') || 'EN').toUpperCase();
+    
+    if (langSpan) langSpan.textContent = currentLang;
+    updateLanguageTexts();
+
+    // BroadcastChannel for instant cross-tab sync
+    const langChannel = (() => { try { return new BroadcastChannel('electra_lang_sync'); } catch(e) { return null; } })();
+
+    if (langToggleBtn) {
+      langToggleBtn.addEventListener('click', () => {
+        currentLang = currentLang === 'EN' ? 'HI' : 'EN';
+        localStorage.setItem('lang', currentLang);
+        if (langSpan) langSpan.textContent = currentLang;
+        updateLanguageTexts();
+        if (langChannel) langChannel.postMessage({ type: 'lang', value: currentLang });
+      });
+    }
+
+    // BroadcastChannel listener (instant, same-origin tabs)
+    if (langChannel) {
+      langChannel.onmessage = (e) => {
+        if (e.data.type === 'lang') {
+          currentLang = e.data.value.toUpperCase();
+          if (langSpan) langSpan.textContent = currentLang;
+          updateLanguageTexts();
+        }
+        if (e.data.type === 'theme') {
+          document.documentElement.setAttribute('data-theme', e.data.value);
+        }
+      };
+    }
+
+    // Fallback: storage event
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'lang' && e.newValue) {
+        currentLang = e.newValue.toUpperCase();
+        if (langSpan) langSpan.textContent = currentLang;
+        updateLanguageTexts();
+      }
+      if (e.key === 'theme' && e.newValue) {
+        document.documentElement.setAttribute('data-theme', e.newValue);
+      }
+    });
+
+    function updateLanguageTexts() {
+      const lang = currentLang;
+      document.querySelectorAll('[data-en], [data-hi]').forEach(el => {
+        if (el.children.length > 0) return; // skip elements with icons/child elements
+        if (lang === 'HI' && el.getAttribute('data-hi')) {
+          el.textContent = el.getAttribute('data-hi');
+        } else if (lang === 'EN' && el.getAttribute('data-en')) {
+          el.textContent = el.getAttribute('data-en');
+        }
+      });
+    }
+
+    // Mobile Menu Dropdown Toggle
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const dropdownContent = document.getElementById('mobile-dropdown-content');
+    if (menuBtn && dropdownContent) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownContent.classList.toggle('active');
+      });
+      document.addEventListener('click', () => {
+        dropdownContent.classList.remove('active');
+      });
+    }
+
+    // Scroll listener for header animation
+    const header = document.querySelector('.app-header');
+    if (header) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

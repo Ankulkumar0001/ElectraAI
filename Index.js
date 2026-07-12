@@ -15,9 +15,57 @@ const AppState = {
   voiceRecognition: null,
   isListening: false,
   history: [],
-  geminiApiKey: '',
+  groqApiKey: localStorage.getItem('groq_api_key') || '',
   userLocation: null
 };
+
+let stopUploadCameraFn = null;
+
+function robustParseJSON(text) {
+  if (!text) return null;
+  const firstBrace = text.indexOf('{');
+  const lastBrace = text.lastIndexOf('}');
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) return null;
+  
+  let jsonString = text.substring(firstBrace, lastBrace + 1);
+  jsonString = jsonString.replace(/\\u(?![0-9a-fA-F]{4})/g, 'u');
+  
+  try {
+    return JSON.parse(jsonString);
+  } catch (err) {
+    console.warn("JSON parse error, trying regex key extraction:", err);
+    try {
+      const report = {};
+      const getRegexMatch = (key) => {
+        const regex = new RegExp(`"${key}"\\s*:\\s*"([^"]*)"`, 'i');
+        const match = jsonString.match(regex);
+        return match ? match[1] : null;
+      };
+      const getArrayRegexMatch = (key) => {
+        const regex = new RegExp(`"${key}"\\s*:\\s*\\[([^\\]]*)\\]`, 'i');
+        const match = jsonString.match(regex);
+        if (match) {
+          return match[1].split(',').map(s => s.replace(/"/g, '').trim()).filter(Boolean);
+        }
+        return [];
+      };
+      
+      report.detected_issue = getRegexMatch('detected_issue') || getRegexMatch('detectedIssue');
+      report.severity = getRegexMatch('severity') || 'moderate';
+      report.root_cause = getRegexMatch('root_cause') || getRegexMatch('rootCause') || getRegexMatch('likely_cause') || getRegexMatch('likelyCause');
+      report.cost_parts = getRegexMatch('cost_parts') || getRegexMatch('costParts') || getRegexMatch('cost');
+      report.safety_alert = getRegexMatch('safety_alert') || getRegexMatch('safetyAlert') || getRegexMatch('safety');
+      
+      report.action_steps = getArrayRegexMatch('action_steps') || getArrayRegexMatch('actionSteps') || getArrayRegexMatch('suggested_fix') || getArrayRegexMatch('suggestedFix');
+      report.tools = getArrayRegexMatch('tools');
+      
+      if (report.detected_issue) return report;
+    } catch (regexErr) {
+      console.error("Regex extraction failed:", regexErr);
+    }
+  }
+  return null;
+}
 
 // --- Language Dictionary (English & Hindi) ---
 const LangDictionary = {
@@ -376,7 +424,7 @@ const Elements = {
   apiSettingsBtn: document.getElementById('api-settings-btn'),
   apiSettingsModal: document.getElementById('api-settings-modal'),
   closeModalBtn: document.getElementById('close-modal-btn'),
-  geminiApiKeyInput: document.getElementById('gemini-api-key-input'),
+  groqApiKeyInput: document.getElementById('groq-api-key-input'),
   toggleKeyVisibility: document.getElementById('toggle-key-visibility'),
   eyeIcon: document.getElementById('eye-icon'),
   saveApiKeyBtn: document.getElementById('save-api-key-btn'),
@@ -441,7 +489,6 @@ const Elements = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-  localStorage.removeItem('gemini_api_key');
   initTheme();
   initLanguage();
   initDeviceGrid();
@@ -454,7 +501,20 @@ document.addEventListener('DOMContentLoaded', () => {
   initApiKeyModal();
   initLocationHandler();
   initImageScanModal();
+  initMobileMenu();
   lucide.createIcons();
+
+  // Scroll listener for header animation
+  const header = document.querySelector('.app-header');
+  if (header) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  }
 });
 
 // --- Theme Management ---
@@ -474,25 +534,86 @@ function setTheme(theme) {
   localStorage.setItem('theme', theme);
 }
 
+// --- Mobile Menu Dropdown Toggle ---
+function initMobileMenu() {
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const dropdownContent = document.getElementById('mobile-dropdown-content');
+  if (menuBtn && dropdownContent) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownContent.classList.toggle('active');
+    });
+    document.addEventListener('click', () => {
+      dropdownContent.classList.remove('active');
+    });
+  }
+}
+
 // --- Language Management ---
+// BroadcastChannel for instant, reliable cross-tab language sync
+const langChannel = (() => {
+  try { return new BroadcastChannel('electra_lang_sync'); } catch (e) { return null; }
+})();
+
 function initLanguage() {
+  const savedLang = (localStorage.getItem('lang') || 'EN').toUpperCase();
+  AppState.currentLang = savedLang;
+  Elements.currentLangText.textContent = savedLang;
+  updateLanguageTexts();
+
   Elements.langToggleBtn.addEventListener('click', () => {
     AppState.currentLang = AppState.currentLang === 'EN' ? 'HI' : 'EN';
+    localStorage.setItem('lang', AppState.currentLang);
     Elements.currentLangText.textContent = AppState.currentLang;
     updateLanguageTexts();
-    
-    // Refresh symptoms list if on Step 2
+    // Broadcast to all other open tabs instantly
+    if (langChannel) langChannel.postMessage({ type: 'lang', value: AppState.currentLang });
     if (AppState.selectedDevice) {
       renderSymptoms(AppState.selectedDevice);
+    }
+  });
+
+  // BroadcastChannel listener (same-origin tabs, instant)
+  if (langChannel) {
+    langChannel.onmessage = (e) => {
+      if (e.data.type === 'lang') {
+        const newLang = e.data.value.toUpperCase();
+        if (newLang !== AppState.currentLang) {
+          AppState.currentLang = newLang;
+          Elements.currentLangText.textContent = newLang;
+          updateLanguageTexts();
+          if (AppState.selectedDevice) renderSymptoms(AppState.selectedDevice);
+        }
+      }
+      if (e.data.type === 'theme') {
+        setTheme(e.data.value);
+      }
+    };
+  }
+
+  // Fallback: storage event for browsers without BroadcastChannel
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'lang' && e.newValue) {
+      const newLang = e.newValue.toUpperCase();
+      if (newLang !== AppState.currentLang) {
+        AppState.currentLang = newLang;
+        Elements.currentLangText.textContent = newLang;
+        updateLanguageTexts();
+        if (AppState.selectedDevice) renderSymptoms(AppState.selectedDevice);
+      }
+    }
+    if (e.key === 'theme' && e.newValue) {
+      setTheme(e.newValue);
     }
   });
 }
 
 function updateLanguageTexts() {
   const lang = AppState.currentLang;
-  
-  // Find all elements with data-en or data-hi attribute
+
+  // Only update leaf-level elements (no child elements) to avoid destroying icons
   document.querySelectorAll('[data-en], [data-hi]').forEach(el => {
+    if (el.children.length > 0) return; // skip elements with child elements (SVGs, icons, etc.)
     if (lang === 'HI' && el.getAttribute('data-hi')) {
       el.textContent = el.getAttribute('data-hi');
     } else if (lang === 'EN' && el.getAttribute('data-en')) {
@@ -588,6 +709,7 @@ function resetDiagnosticApp() {
   // Clear file uploads
   AppState.uploadedImages = [];
   Elements.uploadPreviewsContainer.innerHTML = '';
+  if (stopUploadCameraFn) stopUploadCameraFn();
   
   // Reset active classes on grids
   document.querySelectorAll('.device-card').forEach(c => c.classList.remove('selected'));
@@ -654,6 +776,12 @@ function initSymptomsHandler() {
 
 function renderSymptoms(deviceType) {
   const symptoms = DeviceSymptomsMap[deviceType] || [];
+  
+  // Collect currently checked checkbox values to preserve them across language toggles
+  const checkedVals = new Set(
+    Array.from(Elements.dynamicSymptomsContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+  );
+
   Elements.dynamicSymptomsContainer.innerHTML = '';
   Elements.symptomsValidationMsg.style.display = 'none';
   
@@ -669,6 +797,12 @@ function renderSymptoms(deviceType) {
     input.id = `symptom-${idx}`;
     input.value = s.val;
     input.className = 'symptom-checkbox-input';
+    
+    // Restore check state if it was checked before
+    if (checkedVals.has(s.val)) {
+      input.checked = true;
+      label.classList.add('checked');
+    }
     
     input.addEventListener('change', () => {
       if (input.checked) {
@@ -727,7 +861,7 @@ function initDropzone() {
   // Start diagnosis trigger
   Elements.startDiagnosisBtn.addEventListener('click', runDiagnosticsSimulation);
 
-  // Upload Camera Capture
+  // Upload Camera Capture (Live WebRTC Video Stream)
   const uploadCameraBtn = document.getElementById('upload-camera-btn');
   const uploadCameraWrap = document.getElementById('upload-camera-wrap');
   const uploadVideo = document.getElementById('upload-video');
@@ -737,32 +871,54 @@ function initDropzone() {
   let uploadStream = null;
 
   function stopUploadCamera() {
-    if (uploadStream) { uploadStream.getTracks().forEach(t => t.stop()); uploadStream = null; }
-    uploadCameraWrap.style.display = 'none';
+    if (uploadStream) {
+      uploadStream.getTracks().forEach(t => t.stop());
+      uploadStream = null;
+    }
+    if (uploadCameraWrap) uploadCameraWrap.style.display = 'none';
   }
 
-  uploadCameraBtn.addEventListener('click', async () => {
-    try {
-      uploadStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      uploadVideo.srcObject = uploadStream;
-      uploadCameraWrap.style.display = 'block';
-      lucide.createIcons();
-    } catch {
-      Swal.fire({ icon: 'error', title: AppState.currentLang === 'HI' ? 'कैमरा नहीं खुला' : 'Camera Error', text: AppState.currentLang === 'HI' ? 'कैमरा एक्सेस नहीं मिली।' : 'Camera access denied or not available.', confirmButtonText: 'OK' });
-    }
-  });
+  stopUploadCameraFn = stopUploadCamera;
 
-  uploadStopBtn.addEventListener('click', stopUploadCamera);
+  if (uploadCameraBtn) {
+    uploadCameraBtn.addEventListener('click', async () => {
+      try {
+        uploadStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        if (uploadVideo) {
+          uploadVideo.srcObject = uploadStream;
+          uploadVideo.play().catch(() => {});
+        }
+        if (uploadCameraWrap) uploadCameraWrap.style.display = 'block';
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Camera access error:", err);
+        Swal.fire({
+          icon: 'error',
+          title: AppState.currentLang === 'HI' ? 'कैमरा नहीं खुला' : 'Camera Error',
+          text: AppState.currentLang === 'HI' ? 'कैमरा एक्सेस नहीं मिली।' : 'Camera access denied or not available.',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
 
-  uploadCaptureBtn.addEventListener('click', () => {
-    uploadCanvas.width = uploadVideo.videoWidth;
-    uploadCanvas.height = uploadVideo.videoHeight;
-    uploadCanvas.getContext('2d').drawImage(uploadVideo, 0, 0);
-    const dataUrl = uploadCanvas.toDataURL('image/jpeg');
-    AppState.uploadedImages.push(dataUrl);
-    renderUploadPreviews();
-    stopUploadCamera();
-  });
+  if (uploadStopBtn) {
+    uploadStopBtn.addEventListener('click', stopUploadCamera);
+  }
+
+  if (uploadCaptureBtn && uploadCanvas && uploadVideo) {
+    uploadCaptureBtn.addEventListener('click', () => {
+      if (!uploadVideo.videoWidth) return;
+      uploadCanvas.width = uploadVideo.videoWidth;
+      uploadCanvas.height = uploadVideo.videoHeight;
+      uploadCanvas.getContext('2d').drawImage(uploadVideo, 0, 0);
+      
+      const dataUrl = uploadCanvas.toDataURL('image/jpeg');
+      AppState.uploadedImages.push(dataUrl);
+      renderUploadPreviews();
+      stopUploadCamera();
+    });
+  }
 }
 
 function handleUploadedFiles(files) {
@@ -840,10 +996,10 @@ function runDiagnosticsSimulation() {
     Elements.statusTickerList.style.transform = `translateY(-${activeTickerIdx * 30}px)`;
   }, 700);
 
-  // Start Gemini API call in parallel
-  const geminiPromise = compileDiagnosticsData();
+  // Start Groq API call in parallel
+  const groqPromise = compileDiagnosticsData();
 
-  // Progress bar runs until 90%, then waits for Gemini
+  // Progress bar runs until 90%, then waits for Groq
   const progressInterval = setInterval(() => {
     if (progress < 90) {
       progress += 2;
@@ -851,7 +1007,7 @@ function runDiagnosticsSimulation() {
     }
   }, 80);
 
-  geminiPromise.then(() => {
+  groqPromise.then(() => {
     clearInterval(progressInterval);
     clearInterval(tickerInterval);
 
@@ -887,8 +1043,8 @@ function getDeviceIcon(device) {
 // --- API Key Modal ---
 function initApiKeyModal() {
   // Pre-fill saved key
-  if (AppState.geminiApiKey) {
-    Elements.geminiApiKeyInput.value = AppState.geminiApiKey;
+  if (AppState.groqApiKey) {
+    Elements.groqApiKeyInput.value = AppState.groqApiKey;
   }
 
   Elements.apiSettingsBtn.addEventListener('click', () => {
@@ -908,14 +1064,14 @@ function initApiKeyModal() {
   });
 
   Elements.toggleKeyVisibility.addEventListener('click', () => {
-    const isPassword = Elements.geminiApiKeyInput.type === 'password';
-    Elements.geminiApiKeyInput.type = isPassword ? 'text' : 'password';
+    const isPassword = Elements.groqApiKeyInput.type === 'password';
+    Elements.groqApiKeyInput.type = isPassword ? 'text' : 'password';
     Elements.eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
     lucide.createIcons();
   });
 
   Elements.saveApiKeyBtn.addEventListener('click', () => {
-    const key = Elements.geminiApiKeyInput.value.trim();
+    const key = Elements.groqApiKeyInput.value.trim();
     if (!key) {
       Elements.apiKeyStatus.className = 'modal-status error';
       Elements.apiKeyStatus.textContent = 'Please enter a valid API key.';
@@ -923,10 +1079,11 @@ function initApiKeyModal() {
     }
     if (key.length < 20) {
       Elements.apiKeyStatus.className = 'modal-status error';
-      Elements.apiKeyStatus.textContent = 'Invalid key. Please enter a valid Gemini API key.';
+      Elements.apiKeyStatus.textContent = 'Invalid key. Please enter a valid Groq API key.';
       return;
     }
-    AppState.geminiApiKey = key;
+    AppState.groqApiKey = key;
+    localStorage.setItem('groq_api_key', key);
     Elements.apiKeyStatus.className = 'modal-status success';
     Elements.apiKeyStatus.textContent = '✓ API key saved successfully!';
     setTimeout(() => Elements.apiSettingsModal.classList.remove('active'), 1200);
@@ -934,8 +1091,8 @@ function initApiKeyModal() {
 }
 
 // --- Groq API Call ---
-async function callGeminiAPI(brand, model, year, errCode, description, symptoms, deviceType) {
-  const apiKey = AppState.geminiApiKey;
+async function callGroqAPI(brand, model, year, errCode, description, symptoms, deviceType) {
+  const apiKey = AppState.groqApiKey;
   if (!apiKey) throw new Error('NO_API_KEY');
 
   const lang = AppState.currentLang;
@@ -960,8 +1117,9 @@ async function callGeminiAPI(brand, model, year, errCode, description, symptoms,
 
   const data = await response.json();
   const rawText = data.choices?.[0]?.message?.content || '';
-  const cleaned = rawText.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim();
-  return JSON.parse(cleaned);
+  const parsed = robustParseJSON(rawText);
+  if (!parsed) throw new Error("Failed to parse AI response JSON");
+  return parsed;
 }
 
 // --- Diagnostic Engine & Compiler ---
@@ -979,17 +1137,17 @@ async function compileDiagnosticsData() {
   let chatWelcome = null;
 
   try {
-    const geminiResult = await callGeminiAPI(brand, model,
+    const groqResult = await callGroqAPI(brand, model,
       document.getElementById('device-year').value,
       errCode, description, checkedSymptoms, AppState.selectedDevice
     );
 
-    finalIssues = geminiResult.issues || [];
-    severity = geminiResult.severity || 'moderate';
-    chatWelcome = geminiResult.chat_welcome || null;
+    finalIssues = groqResult.issues || [];
+    severity = groqResult.severity || 'moderate';
+    chatWelcome = groqResult.chat_welcome || null;
 
   } catch (err) {
-    console.error('Gemini API Error:', err.message);
+    console.error('Groq API Error:', err.message);
     navigateToStep(3);
     if (err.message === 'NO_API_KEY') {
       Elements.apiSettingsModal.classList.add('active');
@@ -1128,6 +1286,20 @@ async function compileDiagnosticsData() {
     symptoms: checkedSymptoms.join(', '), issues: finalIssues
   });
 
+  // Render uploaded images in final analysis UI
+  renderResultsImages(AppState.uploadedImages);
+
+  // Compress images for history storage
+  const compressedImages = [];
+  for (const img of AppState.uploadedImages) {
+    try {
+      const comp = await compressImage(img, 400, 400, 0.6);
+      compressedImages.push(comp);
+    } catch (e) {
+      console.error("Compression error:", e);
+    }
+  }
+
   // Save to history
   saveRecordToHistory({
     id: Date.now(),
@@ -1140,10 +1312,11 @@ async function compileDiagnosticsData() {
     primaryIssue: finalIssues[0].name,
     confidence: finalIssues[0].confidence,
     cost: finalIssues[0].cost,
-    finalIssues
+    finalIssues,
+    images: compressedImages
   });
 
-  // Trigger chat welcome with Gemini message if available
+  // Trigger chat welcome with Groq message if available
   if (chatWelcome) {
     Elements.chatMessagesArea.innerHTML = '';
     appendChatMessage(chatWelcome, 'bot');
@@ -1306,7 +1479,15 @@ function triggerBotWelcome(brand, model) {
 function appendChatMessage(text, sender) {
   const bubble = document.createElement('div');
   bubble.className = `chat-bubble ${sender}`;
-  bubble.textContent = text;
+  
+  if (sender === 'bot') {
+    const formatted = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+    bubble.innerHTML = formatted;
+  } else {
+    bubble.textContent = text;
+  }
   
   Elements.chatMessagesArea.appendChild(bubble);
   Elements.chatMessagesArea.scrollTop = Elements.chatMessagesArea.scrollHeight;
@@ -1356,7 +1537,7 @@ async function processChatResponse(query) {
   Elements.chatMessagesArea.scrollTop = Elements.chatMessagesArea.scrollHeight;
 
   try {
-    const apiKey = AppState.geminiApiKey;
+    const apiKey = AppState.groqApiKey;
     if (!apiKey) throw new Error('NO_API_KEY');
 
     const langInstruction = lang === 'HI' ? 'Respond in Hindi only.' : 'Respond in English only.';
@@ -1390,9 +1571,9 @@ async function processChatResponse(query) {
 
   } catch (err) {
     document.getElementById(typingId)?.remove();
-    console.error('Chat Gemini Error:', err.message);
+    console.error('Chat Groq Error:', err.message);
     if (err.message === 'NO_API_KEY') {
-      appendChatMessage(lang === 'HI' ? 'API key सेट नहीं है। कृपया Settings में जाकर Gemini API key डालें।' : 'API key not set. Please add your Gemini API key in Settings.', 'bot');
+      appendChatMessage(lang === 'HI' ? 'API key सेट नहीं है। कृपया Settings में जाकर Groq API key डालें।' : 'API key not set. Please add your Groq API key in Settings.', 'bot');
     } else {
       appendChatMessage(lang === 'HI' ? `AI से जवाब नहीं मिला: ${err.message}` : `AI error: ${err.message}`, 'bot');
     }
@@ -1535,12 +1716,143 @@ function loadHistoryList() {
         </div>
       `;
       card.querySelector('.history-view-btn').addEventListener('click', () => {
-        const formatted = record.scanReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        const reportObj = robustParseJSON(record.scanReply);
+        let popupHtml = '';
+        if (record.image) {
+          popupHtml += `
+            <div style="text-align:center; margin-bottom:16px;">
+              <img src="${record.image}" style="max-width:100%; max-height:240px; border-radius:8px; border:1px solid var(--border-color); object-fit:contain; display:inline-block;">
+            </div>`;
+        }
+
+        if (reportObj && reportObj.detected_issue) {
+          const isHi = AppState.currentLang === 'HI';
+          const severityClass = (reportObj.severity || 'moderate').toLowerCase();
+          const isCritical = severityClass === 'critical';
+          const isModerate = severityClass === 'moderate';
+          
+          popupHtml += `
+            <div class="diagnostic-report-card" style="text-align:left;">
+              <!-- Top Header with Issue Title & Severity -->
+              <div class="report-header-banner banner-${severityClass}">
+                <div class="banner-glow-overlay"></div>
+                <div class="report-issue-title-row">
+                  <div class="report-issue-icon-wrap">
+                    <i data-lucide="${isCritical ? 'skull' : isModerate ? 'alert-triangle' : 'info'}" style="width:16px;height:16px;"></i>
+                  </div>
+                  <div class="report-issue-title-texts">
+                    <span class="report-meta-tag">${isHi ? 'खराबी की पहचान' : 'FAULT DETECTED'}</span>
+                    <h4 class="report-issue-title">${reportObj.detected_issue}</h4>
+                  </div>
+                </div>
+                <div class="report-severity-badge badge-${severityClass}" style="white-space:nowrap; flex-shrink:0;">
+                  <span class="severity-dot"></span>
+                  <span>${reportObj.severity.toUpperCase()}</span>
+                </div>
+              </div>
+
+              <!-- Quick Metrics Grid -->
+              <div class="report-metrics-row">
+                <div class="metric-card card-cost">
+                  <div class="metric-icon-box"><i data-lucide="indian-rupee" style="width:14px;height:14px;"></i></div>
+                  <div class="metric-details">
+                    <span class="metric-label">${isHi ? 'अनुमानित लागत' : 'ESTIMATED COST'}</span>
+                    <span class="metric-value">${reportObj.cost_parts}</span>
+                  </div>
+                </div>
+                <div class="metric-card card-tools-count">
+                  <div class="metric-icon-box"><i data-lucide="wrench" style="width:14px;height:14px;"></i></div>
+                  <div class="metric-details">
+                    <span class="metric-label">${isHi ? 'उपकरण आवश्यक' : 'REQUIRED TOOLS'}</span>
+                    <span class="metric-value">${reportObj.tools ? reportObj.tools.length : 0} ${isHi ? 'उपकरण' : 'Tools'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Detailed Cause Card -->
+              <div class="report-content-panel panel-cause">
+                <div class="panel-header">
+                  <i data-lucide="microscope" style="width:15px;height:15px;"></i>
+                  <span>${isHi ? 'गहरी तकनीकी जांच (Technical Analysis)' : 'Technical Root Cause Analysis'}</span>
+                </div>
+                <p class="panel-desc-body">${reportObj.root_cause}</p>
+              </div>
+
+              <!-- Safety Warning Banner (If present) -->
+              ${reportObj.safety_alert ? `
+              <div class="report-content-panel panel-safety-warning">
+                <div class="safety-glow-bg"></div>
+                <div class="panel-header text-danger">
+                  <i data-lucide="shield-alert" style="width:15px;height:15px;" class="icon-pulse-red"></i>
+                  <span>${isHi ? 'सुरक्षा चेतावनी (Crucial Safety Alert)' : 'Crucial Safety Alert'}</span>
+                </div>
+                <p class="panel-desc-body safety-alert-text">${reportObj.safety_alert}</p>
+              </div>
+              ` : ''}
+
+              <!-- Required Tools Tag List -->
+              ${reportObj.tools && reportObj.tools.length > 0 ? `
+              <div class="report-content-panel panel-tools">
+                <div class="panel-header">
+                  <i data-lucide="wrench" style="width:15px;height:15px;"></i>
+                  <span>${isHi ? 'मरम्मत के आवश्यक टूल्स (Toolbox)' : 'Recommended Toolbox'}</span>
+                </div>
+                <div class="report-tools-modern-grid">
+                  ${reportObj.tools.map(tool => `
+                    <div class="modern-tool-capsule">
+                      <i data-lucide="plus-circle" class="tool-bullet" style="width:13px;height:13px;"></i>
+                      <span>${tool}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
+
+              <!-- Interactive Timeline Steps for suggested fixes -->
+              ${reportObj.action_steps && reportObj.action_steps.length > 0 ? `
+              <div class="report-content-panel panel-timeline">
+                <div class="panel-header">
+                  <i data-lucide="clipboard-list" style="width:15px;height:15px;"></i>
+                  <span>${isHi ? 'सुधारने की चरण-दर-चरण प्रक्रिया' : 'Step-by-Step DIY Guide'}</span>
+                </div>
+                <div class="interactive-repair-timeline">
+                  ${reportObj.action_steps.map((step, idx) => `
+                    <div class="timeline-step-item" onclick="this.classList.toggle('step-done')">
+                      <div class="timeline-connector-line"></div>
+                      <div class="step-check-circle">
+                        <span class="step-num">${idx + 1}</span>
+                        <i data-lucide="check" class="step-check-icon" style="width:14px;height:14px;"></i>
+                      </div>
+                      <div class="step-content-box">
+                        <p class="step-instruction-text">${step}</p>
+                        <span class="step-completed-badge">${isHi ? 'पूरा हुआ' : 'DONE'}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
+            </div>`;
+        } else {
+          const formatted = record.scanReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+          popupHtml += `<div style="text-align:left; font-size:13px; line-height:1.8;">${formatted}</div>`;
+        }
+
         Swal.fire({
           title: AppState.currentLang === 'HI' ? 'इमेज स्कैन रिपोर्ट' : 'Image Scan Report',
-          html: `<div style="text-align:left;font-size:13px;line-height:1.8;">${formatted}</div>`,
+          html: popupHtml,
           confirmButtonText: AppState.currentLang === 'HI' ? 'ठीक है' : 'OK',
-          width: '480px'
+          width: '520px',
+          background: 'rgba(10, 16, 32, 0.95)',
+          backdrop: 'rgba(0, 0, 0, 0.8)',
+          customClass: {
+            popup: 'swal-custom-media-popup'
+          },
+          didOpen: () => {
+            if (window.lucide) {
+              window.lucide.createIcons();
+            }
+          }
         });
       });
       card.querySelector('.history-delete-btn').addEventListener('click', () => deleteHistoryRecord(record.id));
@@ -1757,6 +2069,9 @@ function viewPastRecord(id) {
     issues: record.finalIssues
   });
 
+  // Render past uploaded images
+  renderResultsImages(record.images || []);
+
   // Pre-load Welcoming chatbot message
   triggerBotWelcome(record.brand, record.model);
 
@@ -1889,6 +2204,100 @@ function getDistanceKm(lat1, lng1, lat2, lng2) {
   return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
 }
 
+// Compress base64 image to prevent LocalStorage quota exceeding (5MB limit)
+function compressImage(base64Str, maxWidth, maxHeight, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      } catch (err) {
+        reject(err);
+      }
+    };
+    img.onerror = (err) => reject(err);
+  });
+}
+
+// Render uploaded images in final analysis UI
+function renderResultsImages(imagesArray) {
+  const resultsImgCard = document.getElementById('results-uploaded-images-card');
+  const resultsImgGrid = document.getElementById('results-images-grid');
+  if (!resultsImgCard || !resultsImgGrid) return;
+  resultsImgGrid.innerHTML = '';
+  
+  if (imagesArray && imagesArray.length > 0) {
+    // Add count badge to the header title
+    const titleHeader = resultsImgCard.querySelector('.panel-subheader h3');
+    if (titleHeader) {
+      const existingBadge = resultsImgCard.querySelector('.media-count-badge');
+      if (existingBadge) existingBadge.remove();
+      
+      const badge = document.createElement('span');
+      badge.className = 'media-count-badge';
+      badge.textContent = `${imagesArray.length} ${imagesArray.length === 1 ? 'file' : 'files'}`;
+      titleHeader.appendChild(badge);
+    }
+
+    imagesArray.forEach((imgData, index) => {
+      const container = document.createElement('div');
+      container.className = 'results-img-container';
+      
+      container.innerHTML = `
+        <div class="results-img-wrapper">
+          <img src="${imgData}" alt="Uploaded Device Image ${index + 1}">
+          <div class="results-img-overlay">
+            <i data-lucide="maximize-2"></i>
+          </div>
+          <span class="results-img-index">#0${index + 1}</span>
+        </div>
+      `;
+      
+      container.addEventListener('click', () => {
+        Swal.fire({
+          imageUrl: imgData,
+          imageAlt: 'Uploaded Device Image',
+          showConfirmButton: false,
+          background: 'rgba(13, 20, 38, 0.95)',
+          backdrop: 'rgba(0, 0, 0, 0.8)',
+          width: 'auto',
+          customClass: {
+            popup: 'swal-custom-media-popup',
+            image: 'swal-custom-image'
+          }
+        });
+      });
+      
+      resultsImgGrid.appendChild(container);
+    });
+    resultsImgCard.style.display = 'block';
+    lucide.createIcons();
+  } else {
+    resultsImgCard.style.display = 'none';
+  }
+}
+
 // --- Quick Image Scan Modal ---
 function initImageScanModal() {
   const modal = document.getElementById('image-scan-modal');
@@ -1912,36 +2321,60 @@ function initImageScanModal() {
   let cameraStream = null;
 
   function stopCamera() {
-    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-    cameraWrap.style.display = 'none';
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      cameraStream = null;
+    }
+    if (cameraWrap) cameraWrap.style.display = 'none';
   }
 
-  cameraBtn.addEventListener('click', async () => {
-    try {
-      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      video.srcObject = cameraStream;
-      cameraWrap.style.display = 'block';
-      lucide.createIcons();
-    } catch {
-      Swal.fire({ icon: 'error', title: AppState.currentLang === 'HI' ? 'कैमरा नहीं खुला' : 'Camera Error', text: AppState.currentLang === 'HI' ? 'कैमरा एक्सेस नहीं मिली।' : 'Camera access denied or not available.', confirmButtonText: 'OK' });
-    }
-  });
+  if (cameraBtn) {
+    cameraBtn.addEventListener('click', async () => {
+      if (previewWrap) previewWrap.style.display = 'none';
+      
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        if (video) {
+          video.srcObject = cameraStream;
+          video.play().catch(() => {});
+        }
+        if (cameraWrap) cameraWrap.style.display = 'block';
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Camera access error:", err);
+        Swal.fire({
+          icon: 'error',
+          title: AppState.currentLang === 'HI' ? 'कैमरा नहीं खुला' : 'Camera Error',
+          text: AppState.currentLang === 'HI' ? 'कैमरा एक्सेस नहीं मिली।' : 'Camera access denied or not available.',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
 
-  stopCameraBtn.addEventListener('click', stopCamera);
+  if (stopCameraBtn) {
+    stopCameraBtn.addEventListener('click', stopCamera);
+  }
 
-  captureBtn.addEventListener('click', () => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    base64Image = canvas.toDataURL('image/jpeg');
-    preview.src = base64Image;
-    previewWrap.style.display = 'block';
-    runBtn.disabled = false;
-    clearBtn.style.display = 'inline-flex';
-    resultBox.style.display = 'none';
-    resultBox.innerHTML = '';
-    stopCamera();
-  });
+  if (captureBtn && canvas && video) {
+    captureBtn.addEventListener('click', () => {
+      if (!video.videoWidth) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      
+      base64Image = canvas.toDataURL('image/jpeg');
+      if (preview) preview.src = base64Image;
+      if (previewWrap) previewWrap.style.display = 'flex';
+      if (runBtn) runBtn.disabled = false;
+      if (clearBtn) clearBtn.style.display = 'inline-flex';
+      if (resultBox) {
+        resultBox.style.display = 'none';
+        resultBox.innerHTML = '';
+      }
+      stopCamera();
+    });
+  }
 
   openBtn.addEventListener('click', () => {
     modal.classList.add('active');
@@ -1963,7 +2396,7 @@ function initImageScanModal() {
     reader.onload = e => {
       base64Image = e.target.result;
       preview.src = base64Image;
-      previewWrap.style.display = 'block';
+      previewWrap.style.display = 'flex';
       runBtn.disabled = false;
       clearBtn.style.display = 'inline-flex';
       resultBox.style.display = 'none';
@@ -1984,9 +2417,10 @@ function initImageScanModal() {
     stopCamera();
   });
 
+
   runBtn.addEventListener('click', async () => {
     if (!base64Image) return;
-    if (!AppState.geminiApiKey) {
+    if (!AppState.groqApiKey) {
       Elements.apiSettingsModal.classList.add('active');
       modal.classList.remove('active');
       return;
@@ -1998,23 +2432,26 @@ function initImageScanModal() {
     resultBox.style.display = 'none';
     resultBox.innerHTML = '';
 
+    const overlay = document.getElementById('img-scan-overlay');
+    if (overlay) overlay.classList.add('scanning');
+
     try {
       const lang = AppState.currentLang;
-      const langInstruction = lang === 'HI' ? 'Respond in Hindi only.' : 'Respond in English only.';
+      const langInstruction = lang === 'HI' ? 'Provide all JSON values in Hindi language.' : 'Provide all JSON values in English language.';
 
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AppState.geminiApiKey}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AppState.groqApiKey}` },
         body: JSON.stringify({
           model: 'meta-llama/llama-4-scout-17b-16e-instruct',
           messages: [{
             role: 'user',
             content: [
-              { type: 'text', text: `You are an electronics repair expert. Analyze this image and identify any visible faults, damage, or issues. ${langInstruction} Reply in this format:\n**Detected Issue:** ...\n**Severity:** Critical / Moderate / Minor\n**Likely Cause:** ...\n**Suggested Fix:** ...` },
+              { type: 'text', text: `You are an expert electronics repair technician. Analyze the uploaded image of the device and identify any visible faults, damage, or issues. ${langInstruction} You MUST reply with ONLY a valid JSON object in the following format (do not include any conversational filler, markdown formatting outside of JSON, or markdown blocks): {"detected_issue": "Name of the main issue/fault", "severity": "critical"|"moderate"|"minor", "root_cause": "Deep technical explanation of the root cause", "action_steps": ["Step 1 detailed guide", "Step 2 detailed guide", "Step 3 detailed guide"], "tools": ["Tool 1", "Tool 2"], "cost_parts": "Estimated repair/parts cost in Indian Rupees (₹)", "safety_alert": "Crucial safety warning for the repair process"}` },
               { type: 'image_url', image_url: { url: base64Image } }
             ]
           }],
-          max_tokens: 400
+          max_tokens: 800
         })
       });
 
@@ -2024,27 +2461,152 @@ function initImageScanModal() {
       const reply = data.choices?.[0]?.message?.content?.trim();
       if (!reply) throw new Error('empty_response');
 
-      // Format reply
-      const formatted = reply
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
+      // Try parsing as JSON first
+      const reportObj = robustParseJSON(reply);
 
-      resultBox.innerHTML = `<div class="img-scan-result-box">${formatted}</div>`;
+      if (reportObj && reportObj.detected_issue) {
+        const isHi = AppState.currentLang === 'HI';
+        const severityClass = (reportObj.severity || 'moderate').toLowerCase();
+        const isCritical = severityClass === 'critical';
+        const isModerate = severityClass === 'moderate';
+        
+        resultBox.innerHTML = `
+          <div class="img-scan-result-box" style="padding:0; background:transparent; border:none; box-shadow:none;">
+            <div class="diagnostic-report-card">
+              <!-- Top Header with Issue Title & Severity -->
+              <div class="report-header-banner banner-${severityClass}">
+                <div class="banner-glow-overlay"></div>
+                <div class="report-issue-title-row">
+                  <div class="report-issue-icon-wrap">
+                    <i data-lucide="${isCritical ? 'skull' : isModerate ? 'alert-triangle' : 'info'}"></i>
+                  </div>
+                  <div class="report-issue-title-texts">
+                    <span class="report-meta-tag">${isHi ? 'खराबी की पहचान' : 'FAULT DETECTED'}</span>
+                    <h4 class="report-issue-title">${reportObj.detected_issue}</h4>
+                  </div>
+                </div>
+                <div class="report-severity-badge badge-${severityClass}">
+                  <span class="severity-dot"></span>
+                  <span>${reportObj.severity.toUpperCase()}</span>
+                </div>
+              </div>
+
+              <!-- Quick Metrics Grid -->
+              <div class="report-metrics-row">
+                <div class="metric-card card-cost">
+                  <div class="metric-icon-box"><i data-lucide="indian-rupee"></i></div>
+                  <div class="metric-details">
+                    <span class="metric-label">${isHi ? 'अनुमानित लागत' : 'ESTIMATED COST'}</span>
+                    <span class="metric-value">${reportObj.cost_parts}</span>
+                  </div>
+                </div>
+                <div class="metric-card card-tools-count">
+                  <div class="metric-icon-box"><i data-lucide="wrench"></i></div>
+                  <div class="metric-details">
+                    <span class="metric-label">${isHi ? 'उपकरण आवश्यक' : 'REQUIRED TOOLS'}</span>
+                    <span class="metric-value">${reportObj.tools ? reportObj.tools.length : 0} ${isHi ? 'उपकरण' : 'Tools'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Detailed Cause Card -->
+              <div class="report-content-panel panel-cause">
+                <div class="panel-header">
+                  <i data-lucide="microscope"></i>
+                  <span>${isHi ? 'गहरी तकनीकी जांच (Technical Analysis)' : 'Technical Root Cause Analysis'}</span>
+                </div>
+                <p class="panel-desc-body">${reportObj.root_cause}</p>
+              </div>
+
+              <!-- Safety Warning Banner (If present) -->
+              ${reportObj.safety_alert ? `
+              <div class="report-content-panel panel-safety-warning">
+                <div class="safety-glow-bg"></div>
+                <div class="panel-header text-danger">
+                  <i data-lucide="shield-alert" class="icon-pulse-red"></i>
+                  <span>${isHi ? 'सुरक्षा चेतावनी (Crucial Safety Alert)' : 'Crucial Safety Alert'}</span>
+                </div>
+                <p class="panel-desc-body safety-alert-text">${reportObj.safety_alert}</p>
+              </div>
+              ` : ''}
+
+              <!-- Required Tools Tag List -->
+              ${reportObj.tools && reportObj.tools.length > 0 ? `
+              <div class="report-content-panel panel-tools">
+                <div class="panel-header">
+                  <i data-lucide="wrench"></i>
+                  <span>${isHi ? 'मरम्मत के आवश्यक टूल्स (Toolbox)' : 'Recommended Toolbox'}</span>
+                </div>
+                <div class="report-tools-modern-grid">
+                  ${reportObj.tools.map(tool => `
+                    <div class="modern-tool-capsule">
+                      <i data-lucide="plus-circle" class="tool-bullet"></i>
+                      <span>${tool}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
+
+              <!-- Interactive Timeline Steps for suggested fixes -->
+              ${reportObj.action_steps && reportObj.action_steps.length > 0 ? `
+              <div class="report-content-panel panel-timeline">
+                <div class="panel-header">
+                  <i data-lucide="clipboard-list"></i>
+                  <span>${isHi ? 'सुधारने की चरण-दर-चरण प्रक्रिया' : 'Step-by-Step DIY Guide'}</span>
+                </div>
+                <div class="interactive-repair-timeline">
+                  ${reportObj.action_steps.map((step, idx) => `
+                    <div class="timeline-step-item" onclick="this.classList.toggle('step-done')">
+                      <div class="timeline-connector-line"></div>
+                      <div class="step-check-circle">
+                        <span class="step-num">${idx + 1}</span>
+                        <i data-lucide="check" class="step-check-icon"></i>
+                      </div>
+                      <div class="step-content-box">
+                        <p class="step-instruction-text">${step}</p>
+                        <span class="step-completed-badge">${isHi ? 'पूरा हुआ' : 'DONE'}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      } else {
+        const formatted = reply
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n/g, '<br>');
+        resultBox.innerHTML = `<div class="img-scan-result-box">${formatted}</div>`;
+      }
+
       resultBox.style.display = 'block';
+
+      let compressedImg = null;
+      try {
+        compressedImg = await compressImage(base64Image, 400, 400, 0.6);
+      } catch (compressErr) {
+        console.error("Compression error:", compressErr);
+      }
 
       // Save to history
       saveRecordToHistory({
         id: Date.now(),
         isImageScan: true,
+        image: compressedImg,
         date: new Date().toLocaleDateString(AppState.currentLang === 'HI' ? 'hi-IN' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        primaryIssue: AppState.currentLang === 'HI' ? 'इमेज स्कैन विश्लेषण' : 'Image Scan Analysis',
-        severity: 'moderate',
+        primaryIssue: (reportObj && reportObj.detected_issue) ? reportObj.detected_issue : (AppState.currentLang === 'HI' ? 'इमेज स्कैन विश्लेषण' : 'Image Scan Analysis'),
+        severity: (reportObj && reportObj.severity) ? reportObj.severity.toLowerCase() : 'moderate',
         scanReply: reply
       });
 
     } catch (err) {
       resultBox.innerHTML = `<div class="img-scan-result-box error">${AppState.currentLang === 'HI' ? 'स्कैन विफल: ' : 'Scan failed: '}${err.message}</div>`;
       resultBox.style.display = 'block';
+    } finally {
+      if (overlay) overlay.classList.remove('scanning');
     }
 
     runBtn.disabled = false;
